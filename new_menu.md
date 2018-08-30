@@ -86,3 +86,8 @@ Main
       [-]ip:
       [-]镜像名:
 ```
+
+
+```
+docker images|grep none|awk '{print $3}'|xargs docker rmi
+```

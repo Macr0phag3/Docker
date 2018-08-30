@@ -377,6 +377,7 @@ def dk_menu():  # ok
         else:
             choice_container = int(choice_container)
             if choice_container not in range(len(results[choice_slave]["result"])):
+                show_logo()
                 print put_color(u"虚拟机: %s 无此容器, 重新输入" % ip, "red")
                 goto .choice_sla
 
