@@ -98,8 +98,11 @@ def ip_used(subnet):  # ok
     }
 
     mission = {
-        "command": "ip_used_ls",  # 具体的命令
-        "arg": [subnet],  # 参数(可选)
+        "mission", "cmd2slave",
+        "commands": {
+            "command": "ip_used_ls",
+            "arg": [subnet]
+        }
     }
 
     result = json.loads(load_setting("slave_ip"))
@@ -235,8 +238,11 @@ def check_load():
     }
 
     mission = {
-        "command": "load_ls",
-        "arg": [],
+        "mission", "cmd2slave",
+        "commands": {
+            "command": "load_ls",
+            "arg": [subnet]
+        }
     }
 
     result = json.loads(load_setting("slave_ip"))
@@ -266,8 +272,12 @@ def command2slave(ip, mission, port=1100, timeout=60):  # ok
     1. ip: slave 的 ip
     2. mission: 具体任务, 格式如下：
         {
-            "command": "", #具体的命令
-            "arg": [],     #参数(可选)
+            "mission", "", # 具体的任务
+            "commands":
+            {
+                "command": "", # 具体的命令
+                "arg": [],  # 参数列表
+            }
         }
     3. port: 与 slave 的通信端口; 可选; 默认为 1100
     4. timeout: 等待 slave 返回的超时时间; 可选; 默认为 60s

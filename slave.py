@@ -41,7 +41,7 @@ def recv_command(conn):  # ok
 
 
     {
-        "mission", "command2slave",
+        "mission", "cmd2slave",
         "commands": {
             "command": "",
             "arg": []
@@ -57,10 +57,10 @@ def recv_command(conn):  # ok
     mission = json.loads(msg)
     commands = mission["commands"]  # 具体指令
 
-    if commands == "command2slave":
+    if commands == "cmd2slave":
         conn.sendall(stoolbox.check_alive())
 
-    elif commands == "command2docker":
+    elif commands == "cmd2docker":
         conn.sendall(stoolbox.run(*mission["arg"]))
 
     elif commands == "reload":
