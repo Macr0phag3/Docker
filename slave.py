@@ -121,6 +121,7 @@ while 1:
         try:
             recv_command(conn)
         except Exception, e:
+            print put_color("Something went wrong...\n"+str(e), "red")
             conn.sendall(json.dumps({
                 "code": 1,
                 "msg": str(e),
