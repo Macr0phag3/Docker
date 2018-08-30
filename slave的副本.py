@@ -2,6 +2,7 @@
 import socket
 import stoolbox
 import json
+import traceback
 
 
 def put_color(string, color):  # ok
@@ -64,8 +65,9 @@ def recv_command(conn):  # ok
             reload(stoolbox)
             dicts["code"] = 0
         except Exception, e:
-            log(traceback.format_exc(), level="error",
-                description="reload module stoolbox failed")
+            with open(".slave_log", "a") as fp:
+                fp.write("[%s]\nlevel: %s\ndescription: %s\nmessage: %s\n\n" % (time.strftime(
+                    "%Y-%m-%d %H:%M:%S", time.localtime()), "error", "reload module stoolbox failed", traceback.format_exc()))
 
             dicts["msg"] = str(e)
 
