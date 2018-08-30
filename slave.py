@@ -57,7 +57,7 @@ def recv_command(conn):  # ok
     elif commands == "reload":
         dicts = {
             "code": 1,
-            "msg": ""
+            "msg": "",
             "result": ""
         }
 
