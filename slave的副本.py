@@ -45,24 +45,33 @@ def recv_command(conn):  # ok
         pass
 
     mission = json.loads(msg)
-    command = mission["command"]  # 具体指令
+    commands = mission["commands"]  # 具体指令
 
-    if command == "command2slave":
+    if commands == "command2slave":
         conn.sendall(stoolbox.check_alive())
 
-    elif command == "command2docker":
+    elif commands == "command2docker":
         conn.sendall(stoolbox.run(*mission["arg"]))
 
-    elif command == "command2container":
+    elif commands == "command2container":
         conn.sendall(stoolbox.others_cmd(*mission["arg"]))
 
     else:
-        print put_color("aborted command: %s" % command, "red")
+        print put_color("aborted commands: %s" % commands, "red")
         conn.sendall(json.dumps({
             "code": 1,
             "msg": "This mission is out of slave's ability...",
             "result": ""
         }))
+
+
+{
+    "mission", "command2slave",
+    "commands": {
+        "command": "",
+        "arg": []
+    }
+}
 
 
 """

@@ -81,6 +81,9 @@ def ip_used_ls(subnet):
     return json.dumps(dicts)
 
 
+def commands2container(commands):
+
+
 def run(image_name, ip, nk_name="containers"):  #
     """
     拉起一个容器
