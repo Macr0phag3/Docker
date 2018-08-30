@@ -37,7 +37,7 @@ def commands2docker(commands):
     else:
         return json.dumps({
             "code": 1,
-            "msg": "This command: %s is out of slave's ability..." % commands["command"],
+            "msg": "This command: %s is out of docker's ability..." % commands["command"],
             "result": ""
         })
 
