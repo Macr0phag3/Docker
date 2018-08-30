@@ -50,6 +50,42 @@ def commands2slave(commands):
     elif commands["command"] == "load_ls":
         return load_ls()
 
+    elif commands["command"] == "check_alive":
+        return check_alive()
+
+    else:
+        return json.dumps({
+            "code": 1,
+            "msg": "This command: %s is out of slave's ability..." % commands["command"],
+            "result": ""
+        })
+
+
+def check_alive():
+    """
+    检查网络情况
+
+    返回值示例
+    dicts = {
+        "code": 0,
+        "msg": "",
+        "result": ""
+    }
+    """
+
+    dicts = {
+        "code": 0,
+        "msg": "",
+        "result": "curl to ip.cn failed"
+    }
+
+    for t in range(3):
+        if cmd.getstatusoutput("ping -c 5 -i 0.1 -w 1 baidu.com")[0] == 0:
+            dicts["result"] = ""
+            break
+
+    return json.dumps(dicts)
+
 
 def log(msg, level, description, path="./"):  # ok
     """
@@ -432,31 +468,5 @@ systemctl restart network""" % (nk_name))
         dicts["msg"] = err
     else:
         dicts["code"] = 0
-
-    return json.dumps(dicts)
-
-
-def check_alive():
-    """
-    检查网络情况
-
-    返回值示例
-    dicts = {
-        "code": 0,
-        "msg": "",
-        "result": ""
-    }
-    """
-
-    dicts = {
-        "code": 0,
-        "msg": "",
-        "result": "curl to ip.cn failed"
-    }
-
-    for t in range(3):
-        if cmd.getstatusoutput("ping -c 5 -i 0.1 -w 1 baidu.com")[0] == 0:
-            dicts["result"] = ""
-            break
 
     return json.dumps(dicts)
