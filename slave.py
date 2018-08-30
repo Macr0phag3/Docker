@@ -62,8 +62,8 @@ def recv_command(conn):  # ok
     elif command == "load_ls":
         conn.sendall(stoolbox.load_ls())
 
-    elif command == "image_ls":
-        conn.sendall(stoolbox.image_ls())
+    elif command == "images_ls":
+        conn.sendall(stoolbox.images_ls())
 
     elif command == "ip_used_ls":
         conn.sendall(stoolbox.ip_used_ls(*mission["arg"]))

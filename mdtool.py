@@ -243,7 +243,7 @@ def dk_menu():  # ok
                     ip = j
 
         image_list = json.loads(mtoolbox.command2slave(ip, json.dumps({
-            "command": "image_ls",
+            "command": "images_ls",
             "arg": [], })))
 
         if image_list["code"]:
@@ -397,7 +397,7 @@ def dk_menu():  # ok
         slaves_info = {}
         ips = get_setting("slave_ip")
 
-        results = command2all_slaves(ips, "image_ls")
+        results = command2all_slaves(ips, "images_ls")
         for i, result in enumerate(results):
             slaves_info[ips[i]] = {
                 "image": {
@@ -459,7 +459,7 @@ def dk_menu():  # ok
     elif choice == "4":
         show_logo()
         image_list = json.loads(mtoolbox.command2slave("192.168.12.1", json.dumps({
-            "command": "image_ls",
+            "command": "images_ls",
             "arg": [], })))
 
         if image_list["code"]:
@@ -582,7 +582,7 @@ def dk_more_menu():
 
         choice_list = {
             "1": "containers_ls",
-            "2": "image_ls",
+            "2": "images_ls",
         }
 
         show_logo()

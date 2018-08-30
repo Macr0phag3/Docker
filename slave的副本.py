@@ -53,11 +53,26 @@ def recv_command(conn):  # ok
     elif commands == "command2docker":
         conn.sendall(stoolbox.run(*mission["arg"]))
 
-    elif commands == "command2container":
-        conn.sendall(stoolbox.others_cmd(*mission["arg"]))
+    elif commands == "reload":
+        dicts = {
+            "code": 1,
+            "msg": ""
+            "result": ""
+        }
+
+        try:
+            reload(stoolbox)
+            dicts["code"] = 0
+        except Exception, e:
+            log(traceback.format_exc(), level="error",
+                description="reload module stoolbox failed")
+
+            dicts["msg"] = str(e)
+
+        conn.sendall(json.dumps(dicts))
 
     else:
-        print put_color("aborted commands: %s" % commands, "red")
+        print put_color("aborted command: %s" % commands, "red")
         conn.sendall(json.dumps({
             "code": 1,
             "msg": "This mission is out of slave's ability...",

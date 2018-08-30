@@ -19,6 +19,37 @@ import time
 """
 
 
+def commands2docker(commands):
+    commands = json.loads(commands)
+
+    if commands["command"] == "run":
+        return run(*commands["arg"])
+
+    elif commands["command"] in ["pause", "unpause", "kill", "rm"]:
+        return others_cmd(*commands["arg"])
+
+    elif commands["command"] == "containers_ls":
+        return containers_ls()
+
+    elif commands["command"] == "images_ls":
+        return images_ls()
+    else:
+        return json.dumps({
+            "code": 1,
+            "msg": "This command: %s is out of slave's ability..." % commands["command"],
+            "result": ""
+        })
+
+
+def commands2slave(commands):
+    commands = json.loads(commands)
+    if commands["command"] == "ip_used_ls":
+        return ip_used_ls(*commands["arg"])
+
+    elif commands["command"] == "load_ls":
+        return load_ls()
+
+
 def log(msg, level, description, path="./"):  # ok
     """
     记录事件，默认路径为 slave.py 所在路径
@@ -79,26 +110,6 @@ def ip_used_ls(subnet):
         }[len(result) == 0]
 
     return json.dumps(dicts)
-
-
-def commands2container(commands):
-    commands = json.loads(commands)
-
-    if commands["command"] == "run":
-        return run(*commands["arg"])
-
-    elif commands["command"] in ["pause", "unpause", "kill", "rm"]:
-        return others_cmd(*commands["arg"])
-
-    elif commands["command"] == "containers_ls":
-        return containers_ls()
-
-    else:
-        return json.dumps({
-            "code": 1,
-            "msg": "This command: %s is out of slave's ability..." % commands["command"],
-            "result": ""
-        })
 
 
 def run(image_name, ip, nk_name="containers"):  #
@@ -261,6 +272,40 @@ def containers_ls():  # ok
     return json.dumps(dicts)
 
 
+def images_ls():  # ok
+    """
+    列出所有镜像
+
+    返回值示例
+    dicts = {
+        "code": 1,
+        "msg": "",
+        "result": [
+            "image_name_1",
+            "image_name_2"
+        ]
+    }
+    """
+
+    dicts = {
+        "code": 1,
+        "msg": "",
+        "result": []
+    }
+
+    try:
+        client = docker.from_env()
+        dicts["result"] = [i.tags[0] for i in client.images.list()]
+        dicts["code"] = 0
+    except Exception, e:
+        log(traceback.format_exc(), level="error",
+            description="get all images failed")
+
+        dicts["msg"] = str(e)
+
+    return json.dumps(dicts)
+
+
 def load_ls():  # ok
     """
     查询负载情况
@@ -350,40 +395,6 @@ ip route add default via %s dev $iface""" % (raw_ip, raw_ip, iface, iface, gatew
     except Exception, e:
         log(traceback.format_exc(), level="error",
             description="create network failed")
-
-        dicts["msg"] = str(e)
-
-    return json.dumps(dicts)
-
-
-def image_ls():  # ok
-    """
-    列出所有镜像
-
-    返回值示例
-    dicts = {
-        "code": 1,
-        "msg": "",
-        "result": [
-            "image_name_1",
-            "image_name_2"
-        ]
-    }
-    """
-
-    dicts = {
-        "code": 1,
-        "msg": "",
-        "result": []
-    }
-
-    try:
-        client = docker.from_env()
-        dicts["result"] = [i.tags[0] for i in client.images.list()]
-        dicts["code"] = 0
-    except Exception, e:
-        log(traceback.format_exc(), level="error",
-            description="get all images failed")
 
         dicts["msg"] = str(e)
 

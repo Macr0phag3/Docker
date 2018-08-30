@@ -336,7 +336,7 @@ ip route add default via %s dev $iface""" % (raw_ip, raw_ip, iface, iface, gatew
     return json.dumps(dicts)
 
 
-def image_ls():  # ok
+def images_ls():  # ok
     """
     列出所有镜像
 
