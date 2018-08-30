@@ -38,6 +38,15 @@ def recv_command(conn):  # ok
 
     参数
     1. conn: 建立起的通道
+
+
+    {
+        "mission", "command2slave",
+        "commands": {
+            "command": "",
+            "arg": []
+        }
+    }
     """
 
     msg = conn.recv(1024)
@@ -80,15 +89,6 @@ def recv_command(conn):  # ok
             "msg": "This mission is out of slave's ability...",
             "result": ""
         }))
-
-
-{
-    "mission", "command2slave",
-    "commands": {
-        "command": "",
-        "arg": []
-    }
-}
 
 
 """
