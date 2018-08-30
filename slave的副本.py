@@ -47,26 +47,14 @@ def recv_command(conn):  # ok
     mission = json.loads(msg)
     command = mission["command"]  # 具体指令
 
-    if command == "check_alive":
+    if command == "command2slave":
         conn.sendall(stoolbox.check_alive())
 
-    elif command == "run":
+    elif command == "command2docker":
         conn.sendall(stoolbox.run(*mission["arg"]))
 
-    elif command == "others_cmd":
+    elif command == "command2container":
         conn.sendall(stoolbox.others_cmd(*mission["arg"]))
-
-    elif command == "containers_ls":
-        conn.sendall(stoolbox.containers_ls())
-
-    elif command == "load_ls":
-        conn.sendall(stoolbox.load_ls())
-
-    elif command == "image_ls":
-        conn.sendall(stoolbox.image_ls())
-
-    elif command == "ip_used_ls":
-        conn.sendall(stoolbox.ip_used_ls(*mission["arg"]))
 
     else:
         print put_color("aborted command: %s" % command, "red")
