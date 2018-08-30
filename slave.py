@@ -55,13 +55,13 @@ def recv_command(conn):  # ok
         pass
 
     mission = json.loads(msg)
-    commands = mission["commands"]  # 具体指令
+    commands = mission["mission"]  # 具体指令
 
     if commands == "cmd2slave":
-        conn.sendall(stoolbox.check_alive())
+        conn.sendall(stoolbox.cmd2slave(mission["commands"]))
 
     elif commands == "cmd2docker":
-        conn.sendall(stoolbox.run(*mission["arg"]))
+        conn.sendall(stoolbox.cmd2docker(mission["commands"]))
 
     elif commands == "reload":
         dicts = {
@@ -117,7 +117,16 @@ while 1:
     client_data = conn.recv(1024)
     if sign_in(client_data):
         conn.sendall('hello, my master')
-        recv_command(conn)
+
+        try:
+            recv_command(conn)
+        except Exception, e:
+            conn.sendall(json.dumps({
+                "code": 1,
+                "msg": str(e),
+                "result": "",
+            }))
+
     else:
         msg = "tell %s: silence is gold" % from_ip
         print put_color(msg, "yellow")
