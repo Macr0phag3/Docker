@@ -368,29 +368,29 @@ def dk_menu():  # ok
 
         if not choice_container.isdigit():
             show_logo()
-            print put_color("输入有误, 重新输入", "red")
+            print put_color(u"输入有误, 重新输入", "red")
             goto .choice_sla
         else:
             choice_container = int(choice_container)
             if choice_container not in range(len(results[choice_slave]["result"])):
-                print put_color("虚拟机: %s 无此容器, 重新输入" % ip, "red")
+                print put_color(u"虚拟机: %s 无此容器, 重新输入" % ip, "red")
                 goto .choice_sla
 
         id_or_name = results[choice_slave]["result"][choice_container]["id"]
         show_logo()
-        print "[+]回收容器:", id_or_name
+        print u"[+]回收容器:", id_or_name
         mission["commands"]["arg"] = [id_or_name, "kill"]
-        print "  [-]停止容器 ...",
+        print u"  [-]停止容器 ...",
         result = json.loads(mtoolbox.command2slave(
             ip, json.dumps(mission)))
 
         if result["code"]:
-            print put_color("失败", "red")
+            print put_color(u"失败", "red")
             print u"  [x]" + result["msg"]
             goto .docker
 
-        print put_color("成功", "green")
-        print "  [-]删除容器 ...",
+        print put_color(u"成功", "green")
+        print u"  [-]删除容器 ...",
         mission["commands"]["arg"] = [id_or_name, "rm"]
         result = json.loads(mtoolbox.command2slave(
             ip, json.dumps(mission)))
@@ -400,8 +400,8 @@ def dk_menu():  # ok
             print u"  [x]" + result["msg"]
             goto .docker
 
-        print put_color("成功", "green")
-        print "[!]完成"
+        print put_color(u"成功", "green")
+        print u"[!]完成"
 
     elif choice == "3":
         slaves_info = {}
@@ -494,7 +494,7 @@ def dk_menu():  # ok
         abort(1, 1)
 
     else:
-        print put_color("输入有误, 重新输入", "red")
+        print put_color(u"输入有误, 重新输入", "red")
 
     goto .docker
 
@@ -533,19 +533,19 @@ def dk_more_menu():
     show_logo()
 
     if choice == "1":
-        ip = raw_input("输入分配容器的虚拟机的 ip: ")
+        ip = raw_input(u"输入分配容器的虚拟机的 ip: ")
         if ip == "":
             show_logo()
             print put_color(u"操作已取消", "yellow")
             goto .dk_more_menu
 
-        image_name = raw_input("输入镜像名（必要时加上版本号）: ")
+        image_name = raw_input(u"输入镜像名（必要时加上版本号）: ")
         if image_name == "":
             show_logo()
             print put_color(u"操作已取消", "yellow")
             goto .dk_more_menu
 
-        container_ip = raw_input("输入给容器分配的 ip: ")
+        container_ip = raw_input(u"输入给容器分配的 ip: ")
         if container_ip == "":
             show_logo()
             print put_color(u"操作已取消", "yellow")
@@ -554,8 +554,8 @@ def dk_more_menu():
         subnet = get_setting("bridge")["subnet"]
         result = json.loads(mtoolbox.ip_assign(subnet, container_ip))
         if result["code"]:
-            print put_color("指定 ip 失败", "red")
-            print "原因如下:\n", result["msg"]
+            print put_color(u"指定 ip 失败", "red")
+            print u"原因如下:\n", result["msg"]
         else:
             container_ip = result["result"]
             result = json.loads(
