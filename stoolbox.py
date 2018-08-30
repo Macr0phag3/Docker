@@ -25,7 +25,7 @@ def cmd2docker(commands):
     if commands["command"] == "run":
         return run(*commands["arg"])
 
-    elif commands["command"] in ["pause", "unpause", "kill", "rm"]:
+    elif commands["command"] == "others_cmd":
         return others_cmd(*commands["arg"])
 
     elif commands["command"] == "containers_ls":

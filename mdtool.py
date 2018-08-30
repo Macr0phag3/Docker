@@ -87,7 +87,11 @@ def nk_menu():  # ok
 
     if choice == '1':
         mission = {
-            "command": "check_alive"
+            "mission", "cmd2slave",
+            "commands": {
+                "command": "check_alive",
+                "arg": [subnet]
+            }
         }
 
         ips = get_setting("slave_ip")
@@ -166,8 +170,11 @@ def notrun(command):  # ok
         goto .notrun
 
     mission = {
-        "command": "others_cmd",
-        "arg": []
+        "mission", "cmd2docker",
+        "commands": {
+            "command": "others_cmd",
+            "arg": []
+        }
     }
 
     show_logo()
@@ -186,7 +193,7 @@ def notrun(command):  # ok
             goto .notrun
 
     elif choice == "3":
-        mission["command"] = "containers_ls"
+        mission["commands"]["command"] = "containers_ls"
         result = json.loads(mtoolbox.command2slave(ip, json.dumps(mission)))
         if result["code"]:
             print put_color("获得 %s 的所有容器失败" % ip, "red")
@@ -196,10 +203,10 @@ def notrun(command):  # ok
             name = result["result"]
             for i in name:
                 names.append(i["id"])
-        mission["command"] = "others_cmd"
+        mission["commands"]["command"] = "others_cmd"
 
     for name in names:
-        mission["arg"] = [name, command]
+        mission["commands"]["arg"] = [name, command]
         pprint(mtoolbox.command2slave(ip, json.dumps(mission)))
 
 
@@ -290,8 +297,11 @@ def dk_menu():  # ok
 
     elif choice == "2":
         mission = {
-            "command": "others_cmd",
-            "arg": [],
+            "mission", "cmd2docker",
+            "commands": {
+                "command": "others_cmd",
+                "arg": []
+            }
         }
 
         ips = get_setting("slave_ip")
@@ -369,7 +379,7 @@ def dk_menu():  # ok
         id_or_name = results[choice_slave]["result"][choice_container]["id"]
         show_logo()
         print "[+]回收容器:", id_or_name
-        mission["arg"] = [id_or_name, "kill"]
+        mission["commands"]["arg"] = [id_or_name, "kill"]
         print "  [-]停止容器 ...",
         result = json.loads(mtoolbox.command2slave(
             ip, json.dumps(mission)))
@@ -381,7 +391,7 @@ def dk_menu():  # ok
 
         print put_color("成功", "green")
         print "  [-]删除容器 ...",
-        mission["arg"] = [id_or_name, "rm"]
+        mission["commands"]["arg"] = [id_or_name, "rm"]
         result = json.loads(mtoolbox.command2slave(
             ip, json.dumps(mission)))
 
@@ -490,8 +500,11 @@ def command2all_slaves(ips, command):
     result = []
     for ip in ips:
         mission = {
-            "command": command,
-            "arg": [],
+            "mission", "cmd2docker",
+            "commands": {
+                "command": command,
+                "arg": []
+            }
         }
         result.append(json.loads(mtoolbox.command2slave(ip, json.dumps(mission))))
     return result
