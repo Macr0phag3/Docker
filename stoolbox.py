@@ -20,8 +20,6 @@ import time
 
 
 def cmd2docker(commands):
-    commands = json.loads(commands)
-
     if commands["command"] == "run":
         return run(*commands["arg"])
 
@@ -43,7 +41,6 @@ def cmd2docker(commands):
 
 
 def cmd2slave(commands):
-    commands = json.loads(commands)
     if commands["command"] == "ip_used_ls":
         return ip_used_ls(*commands["arg"])
 

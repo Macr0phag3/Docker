@@ -123,6 +123,7 @@ while 1:
         except Exception, e:
             print put_color("something went wrong\n  [-]"+str(e), "red")
             print traceback.format_exc()
+            print "-"*50
             conn.sendall(json.dumps({
                 "code": 1,
                 "msg": str(e),
