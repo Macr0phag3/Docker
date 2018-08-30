@@ -2,7 +2,6 @@
 import socket
 import stoolbox
 import json
-import traceback
 
 
 def put_color(string, color):  # ok
@@ -46,49 +45,36 @@ def recv_command(conn):  # ok
         pass
 
     mission = json.loads(msg)
-    commands = mission["commands"]  # 具体指令
+    command = mission["command"]  # 具体指令
 
-    if commands == "command2slave":
+    if command == "check_alive":
         conn.sendall(stoolbox.check_alive())
 
-    elif commands == "command2docker":
+    elif command == "run":
         conn.sendall(stoolbox.run(*mission["arg"]))
 
-    elif commands == "reload":
-        dicts = {
-            "code": 1,
-            "msg": ""
-            "result": ""
-        }
+    elif command == "others_cmd":
+        conn.sendall(stoolbox.others_cmd(*mission["arg"]))
 
-        try:
-            reload(stoolbox)
-            dicts["code"] = 0
-        except Exception, e:
-            with open(".slave_log", "a") as fp:
-                fp.write("[%s]\nlevel: %s\ndescription: %s\nmessage: %s\n\n" % (time.strftime(
-                    "%Y-%m-%d %H:%M:%S", time.localtime()), "error", "reload module stoolbox failed", traceback.format_exc()))
+    elif command == "containers_ls":
+        conn.sendall(stoolbox.containers_ls())
 
-            dicts["msg"] = str(e)
+    elif command == "load_ls":
+        conn.sendall(stoolbox.load_ls())
 
-        conn.sendall(json.dumps(dicts))
+    elif command == "images_ls":
+        conn.sendall(stoolbox.images_ls())
+
+    elif command == "ip_used_ls":
+        conn.sendall(stoolbox.ip_used_ls(*mission["arg"]))
 
     else:
-        print put_color("aborted command: %s" % commands, "red")
+        print put_color("aborted command: %s" % command, "red")
         conn.sendall(json.dumps({
             "code": 1,
             "msg": "This mission is out of slave's ability...",
             "result": ""
         }))
-
-
-{
-    "mission", "command2slave",
-    "commands": {
-        "command": "",
-        "arg": []
-    }
-}
 
 
 """
