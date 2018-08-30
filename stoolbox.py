@@ -146,7 +146,7 @@ def ip_used_ls(subnet):
     return json.dumps(dicts)
 
 
-def run(image_name, ip, nk_name="containers"):  #
+def run(image_name, ip, command="", nk_name="containers"):  #
     """
     拉起一个容器
 
@@ -179,7 +179,7 @@ def run(image_name, ip, nk_name="containers"):  #
                 ipv4_address=ip)})
 
         con_ready = client.create_container(
-            image_name, stdin_open=True, command="/bin/sh",
+            image_name, stdin_open=True, command=command,
             detach=True, tty=True, networking_config=networking_config
         )  # 保证容器不会运行后立刻退出的必要可选参数
 
