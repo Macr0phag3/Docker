@@ -82,6 +82,23 @@ def ip_used_ls(subnet):
 
 
 def commands2container(commands):
+    commands = json.loads(commands)
+
+    if commands["command"] == "run":
+        return run(*commands["arg"])
+
+    elif commands["command"] in ["pause", "unpause", "kill", "rm"]:
+        return others_cmd(*commands["arg"])
+
+    elif commands["command"] == "containers_ls":
+        return containers_ls()
+
+    else:
+        return json.dumps({
+            "code": 1,
+            "msg": "This command: %s is out of slave's ability..." % commands["command"],
+            "result": ""
+        })
 
 
 def run(image_name, ip, nk_name="containers"):  #
