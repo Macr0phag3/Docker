@@ -249,9 +249,12 @@ def dk_menu():  # ok
                     min_load = value
                     ip = j
 
-        image_list = json.loads(mtoolbox.command2slave(ip, json.dumps({
-            "command": "images_ls",
-            "arg": [], })))
+        image_list = json.loads(mtoolbox.command2slave(ip, json.dumps({{
+                "mission": "cmd2docker",
+                "commands": {
+                    "command": "images_ls",
+                    "arg": []
+                    }})))
 
         if image_list["code"]:
             print put_color(u"获取虚拟机: %s 的所有镜像失败" % ip, "red")
@@ -279,8 +282,9 @@ def dk_menu():  # ok
         image_name = image_list["result"][int(choice_image)]
         result = json.loads(
             mtoolbox.command2slave(
-                ip,
-                json.dumps({
+                ip, json.dumps({
+                    "mission": "cmd2docker",
+                    "commands": {
                     "command": "run",
                     "arg": [image_name, container_ip]
                 })))
@@ -560,12 +564,13 @@ def dk_more_menu():
             container_ip = result["result"]
             result = json.loads(
                 mtoolbox.command2slave(
-                    ip,
-                    json.dumps({
-                        "command": "run",
-                        "arg": [image_name,
-                                container_ip]
-                    })))
+                    ip, json.dumps({{
+                            "mission": "cmd2docker",
+                            "commands": {
+                                "command": "run",
+                                "arg": [image_name, container_ip]
+                        }}})))
+
 
             if result["code"]:
                 print put_color("启动容器失败", "red")
