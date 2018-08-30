@@ -469,8 +469,11 @@ def dk_menu():  # ok
     elif choice == "4":
         show_logo()
         image_list = json.loads(mtoolbox.command2slave("192.168.12.1", json.dumps({
-            "command": "images_ls",
-            "arg": [], })))
+            "mission": "cmd2docker",
+            "commands": {
+                "command": "images_ls",
+                "arg": []
+            }})))
 
         if image_list["code"]:
             print put_color(u"获取虚拟机: 192.168.12.1 的所有镜像失败", "red")
