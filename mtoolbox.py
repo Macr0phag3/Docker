@@ -98,7 +98,7 @@ def ip_used(subnet):  # ok
     }
 
     mission = {
-        "mission", "cmd2slave",
+        "mission": "cmd2slave",
         "commands": {
             "command": "ip_used_ls",
             "arg": [subnet]
@@ -238,7 +238,7 @@ def check_load():
     }
 
     mission = {
-        "mission", "cmd2slave",
+        "mission": "cmd2slave",
         "commands": {
             "command": "load_ls",
             "arg": [subnet]
@@ -272,7 +272,7 @@ def command2slave(ip, mission, port=1100, timeout=60):  # ok
     1. ip: slave 的 ip
     2. mission: 具体任务, 格式如下：
         {
-            "mission", "", # 具体的任务
+            "mission": "", # 具体的任务
             "commands":
             {
                 "command": "", # 具体的命令

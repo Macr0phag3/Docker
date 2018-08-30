@@ -87,7 +87,7 @@ def nk_menu():  # ok
 
     if choice == '1':
         mission = {
-            "mission", "cmd2slave",
+            "mission": "cmd2slave",
             "commands": {
                 "command": "check_alive",
                 "arg": [subnet]
@@ -170,7 +170,7 @@ def notrun(command):  # ok
         goto .notrun
 
     mission = {
-        "mission", "cmd2docker",
+        "mission": "cmd2docker",
         "commands": {
             "command": "others_cmd",
             "arg": []
@@ -297,7 +297,7 @@ def dk_menu():  # ok
 
     elif choice == "2":
         mission = {
-            "mission", "cmd2docker",
+            "mission": "cmd2docker",
             "commands": {
                 "command": "others_cmd",
                 "arg": []
@@ -500,7 +500,7 @@ def command2all_slaves(ips, command):
     result = []
     for ip in ips:
         mission = {
-            "mission", "cmd2docker",
+            "mission": "cmd2docker",
             "commands": {
                 "command": command,
                 "arg": []

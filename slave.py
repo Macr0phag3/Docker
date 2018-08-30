@@ -41,7 +41,7 @@ def recv_command(conn):  # ok
 
 
     {
-        "mission", "cmd2slave",
+        "mission": "cmd2slave",
         "commands": {
             "command": "",
             "arg": []
