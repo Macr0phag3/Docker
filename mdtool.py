@@ -443,12 +443,14 @@ def dk_menu():  # ok
                 print put_color("\n  [X]containers", "red")
                 print "    [-]error: "+containers_info["msg"]
             else:
-                print "\n  [-]containers(%s)" % put_color(str(len(containers_info["containers"])), "blue")
+                print "\n  [-]containers(%s)" % put_color(
+                    str(len(containers_info["containers"])), "blue")
                 for container in containers_info["containers"]:
                     print "    [-]short id: "+put_color(container["id"][:6], "white")
                     print "      [-]ip: "+put_color(container["ip"], "white")
                     print "      [-]id: "+container["id"]
-                    print "      [-]status: "+put_color(container["status"], "green" if container["status"] == "running" else "yellow")
+                    print "      [-]status: "+put_color(container["status"],
+                                                        "green" if container["status"] == "running" else "yellow")
                     print "      [-]image name: "+put_color(container["image name"], "white")
                     print
 
