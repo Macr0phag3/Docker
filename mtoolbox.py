@@ -241,7 +241,7 @@ def check_load():
         "mission": "cmd2slave",
         "commands": {
             "command": "load_ls",
-            "arg": [subnet]
+            "arg": []
         }
     }
 
