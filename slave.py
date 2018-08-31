@@ -55,7 +55,7 @@ def recvd_cmd(mission):
             print pt.put_color(u"重新载入模块: stoolbox 失败\n  [-]"+str(e), "red")
             print "-"*50
             pt.log(traceback.format_exc(), level="error",
-                   description="reload module stoolbox failed", path=".slave_log")
+                   description="%s reload module stoolbox failed" % setting["bridge"]["self_ip"], path=".slave_log")
             dicts["msg"] = str(e)
 
         return json.dumps(dicts)
@@ -137,8 +137,8 @@ while 1:
             except Exception, e:
                 print pt.put_color(u"处理信息时发生问题\n  [-]"+str(e), "red")
                 print "-"*50
-                pt.log(traceback.format_exc(), level="error",
-                       description="reload module stoolbox failed", path=".slave_log")
+                pt.log(traceback.format_exc(), level="error", description="slave(%s) recvd command but can't finish it" %
+                       setting["bridge"]["self_ip"], path=".slave_log")
 
                 conn.sendall(json.dumps([{
                     "code": 1,
