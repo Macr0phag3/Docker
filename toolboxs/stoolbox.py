@@ -169,8 +169,8 @@ def run(image_name, ip, command="", nk_name="containers"):  #
         dicts["result"]["id"] = id
 
     except Exception, e:
-        log(traceback.format_exc(), level="error",
-            description="run a container: %s: %s failed" % (image_name, ip), path=".slave_log")
+        pt.log(traceback.format_exc(), level="error",
+               description="run a container: %s: %s failed" % (image_name, ip), path=".slave_log")
 
         dicts["msg"] = "slave(%s) report a error: %s" % (setting["bridge"]["self_ip"], str(e))
 
@@ -440,7 +440,7 @@ docker network rm %s;
 systemctl restart network""" % (nk_name))
 
     if status:
-        log(err, level="error", description="unbridge network failed", path=".slave_log")
+        pt.log(err, level="error", description="unbridge network failed", path=".slave_log")
         dicts["msg"] = "slave(%s) report a error: %s" % (setting["bridge"]["self_ip"], err)
     else:
         dicts["code"] = 0

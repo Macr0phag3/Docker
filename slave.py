@@ -24,7 +24,7 @@ def sign_in(ckey):  # ok
 
 def recvd_cmd(mission):
     """
-    处理 master 发来的任务，具体负责转发任务与返回结果
+    处理 master 发来的任务，具体负责任务的转发与结果的返回
 
     参数
     1. mission: master 发来的任务
@@ -41,7 +41,7 @@ def recvd_cmd(mission):
     elif commands == "cmd2docker":
         return st.cmd2docker(mission["commands"])
 
-    elif commands == "reload":
+    elif commands == "reload":  # 重新载入模块 stoolbox，无需重启 slave
         dicts = {
             "code": 1,
             "msg": "",
@@ -53,8 +53,9 @@ def recvd_cmd(mission):
             dicts["code"] = 0
         except Exception, e:
             print pt.put_color("reload module stoolbox failed\n  [-]"+str(e), "red")
-            print traceback.format_exc()
             print "-"*50
+            pt.log(traceback.format_exc(), level="error",
+                   description="reload module stoolbox failed", path=".slave_log")
             dicts["msg"] = str(e)
 
         return json.dumps(dicts)
@@ -93,10 +94,10 @@ def recvd_msg(conn):  # ok
 
     mission = json.loads(msg)
 
-    if type(mission) == dict:
+    if type(mission) == dict:  # 单任务模式
         recvd_cmd(mission)
 
-    elif type(mission) == list:
+    elif type(mission) == list:  # 多任务模式
         results = json.dumps([json.loads(recvd_cmd(mission)) for m in mission])
 
     else:
@@ -140,8 +141,10 @@ while 1:
             recvd_msg(conn)
         except Exception, e:
             print pt.put_color("something went wrong\n  [-]"+str(e), "red")
-            print traceback.format_exc()
             print "-"*50
+            pt.log(traceback.format_exc(), level="error",
+                   description="reload module stoolbox failed", path=".slave_log")
+
             conn.sendall(json.dumps([{
                 "code": 1,
                 "msg": str(e),
