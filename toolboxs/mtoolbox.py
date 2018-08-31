@@ -5,7 +5,7 @@ import IPy
 import random
 import socket
 import json
-import time
+import ptoolbox as pt
 
 """
 1. 返回值 json 说明：
@@ -18,23 +18,6 @@ import time
 2. 以下函数返回值示例均写成 dict
 3. 接收返回值的时候注意将 json 转回 dict
 """
-
-
-def log(msg, level, description="None", path="./"):  # ok
-    """
-    记录事件，默认路径为 slave.py 所在路径
-    log 文件名为 .master_log
-
-    参数:
-    1. level: 事件等级
-    2. description: 事件描述
-    3. message: 事件原因的具体描述
-    4. path: log 文件的路径; 可选; 默认为 ./
-    """
-
-    with open(path+".master_log", "a") as fp:
-        fp.write("[%s]\nlevel: %s\ndescription: %s\nmessage: %s\n\n" %
-                 (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), level, description.encode("utf8"), msg))
 
 
 def load_setting(config):  # ok
@@ -64,8 +47,8 @@ def load_setting(config):  # ok
             dicts["result"] = json.load(fp)[config]
             dicts["code"] = 0
     except Exception, e:
-        log(traceback.format_exc(), level="error",
-            description="load setting: %s failed!" % (config))
+        pt.log(traceback.format_exc(), level="error",
+               description="load setting: %s failed!" % (config), path=".master_log")
 
         dicts["msg"] = str(e)
 
@@ -157,8 +140,8 @@ def ip_ls(subnet):  # ok
             dicts["result"] = list(set(ips)-set(used_ip["result"]))
             dicts["code"] = 0
         except Exception, e:
-            log(traceback.format_exc(), level="error",
-                description="the subnet must be in standard form.")
+            pt.log(traceback.format_exc(), level="error",
+                   description="the subnet must be in standard form.", path=".master_log")
 
             dicts["msg"] = " (%s)" % str(e)
 
@@ -208,8 +191,8 @@ def ip_assign(subnet, ip=0):  # ok
                     else:
                         dicts["msg"] = "ip 不在网段 %s 内" % subnet
                 except Exception, e:
-                    log(traceback.format_exc(), level="error",
-                        description="this ip is illegal.")
+                    pt.log(traceback.format_exc(), level="error",
+                           description="this ip is illegal.", path=".master_log")
 
                     dicts["msg"] = "ip 地址非法"
 
@@ -304,8 +287,8 @@ def command2slave(ip, mission, port=1100, timeout=60):  # ok
             break
         except Exception, e:
             if i == 2:
-                log(traceback.format_exc(), level="error",
-                    description="connect to slave: %s:%s failed" % (ip, port))
+                pt.log(traceback.format_exc(), level="error",
+                       description="connect to slave: %s:%s failed" % (ip, port), path=".master_log")
 
                 dicts["msg"] = "connect to slave: %s:%s failed" % (ip, port)
                 return json.dumps(dicts)
@@ -322,8 +305,8 @@ def command2slave(ip, mission, port=1100, timeout=60):  # ok
             dicts["msg"] = "sign in failed"
 
     except Exception, e:
-        log(traceback.format_exc(), level="error",
-            description="send a mission to slave(%s) failed" % (ip))
+        pt.log(traceback.format_exc(), level="error",
+               description="send a mission to slave(%s) failed" % (ip), path=".master_log")
 
         dicts["msg"] = "send a mission to slave(%s) failed: %s" % (ip, str(e))
 

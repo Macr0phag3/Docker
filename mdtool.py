@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from toolboxs import mtoolbox as mt
+from toolboxs import ptoolbox as pt
 from goto import with_goto
 from pprint import pprint
 import sys
@@ -12,7 +13,7 @@ def abort(a, b):  # ok
     if b != 0:
         show_logo()
 
-    sys.exit(put_color(
+    sys.exit(pt.put_color(
         random.choice([
             "Goodbye", "Have a nice day",
             "See you later", "Bye",
@@ -20,20 +21,9 @@ def abort(a, b):  # ok
         ]), "white"))
 
 
-def put_color(string, color):  # ok
-    colors = {
-        "green": "32",
-        "red": "31",
-        "yellow": "33",
-        "white": "37",
-        "blue": "36",
-    }
-    return "\033[40;1;%s;40m%s\033[0m" % (colors[color], string)
-
-
 def colored_choice(num):
-    num_color = [put_color(str(i+1), "blue") for i in range(num)]
-    alpha_color = [put_color(i, "yellow") for i in ['b', 'q']]
+    num_color = [pt.put_color(str(i+1), "blue") for i in range(num)]
+    alpha_color = [pt.put_color(i, "yellow") for i in ['b', 'q']]
     return num_color + alpha_color
 
 
@@ -46,22 +36,22 @@ def show_logo():  # ok
     print """
     %s\
     %s\
-%s""" % (put_color("""
+%s""" % (pt.put_color("""
       .-""`""-.
   __/`oOoOoOoOo`\__
   '.-=-=-=-=-=-=-.'
     `-=.=-.-=.=-'
        ^  ^  ^\
-    """, "yellow"),  put_color("""
+    """, "yellow"),  pt.put_color("""
 hack it and docker it
-""", "green"), put_color("======================\n", "white"))
+""", "green"), pt.put_color("======================\n", "white"))
 
 
 def get_setting(name):
     setting = json.loads(mt.load_setting(name))
     if setting["code"]:
         show_logo()
-        print put_color(u"获取配置失败", "red")
+        print pt.put_color(u"获取配置失败", "red")
         print "原因如下:\n", setting["msg"]
         abort(1, 0)
     else:
@@ -98,32 +88,33 @@ def nk_menu():  # ok
         for ip in ips:
             result = json.loads(mt.command2slave(ip, json.dumps(mission), timeout=10))
             if result["code"]:
-                print put_color(ip, "red"), put_color(u"内网", "red"), put_color(u"外网", "red")
+                print pt.put_color(ip, "red"), pt.put_color(
+                    u"内网", "red"), pt.put_color(u"外网", "red")
             else:
                 if result["result"]:
-                    print put_color(ip, "yellow"), put_color(
-                        u"内网", "green"), put_color(u"外网", "red")
+                    print pt.put_color(ip, "yellow"), pt.put_color(
+                        u"内网", "green"), pt.put_color(u"外网", "red")
                 else:
-                    print put_color(ip, "green"), put_color(
-                        u"内网", "green"), put_color(u"外网", "green")
+                    print pt.put_color(ip, "green"), pt.put_color(
+                        u"内网", "green"), pt.put_color(u"外网", "green")
 
     elif choice == '2':
         result = json.loads(mt.ip_ls(subnet))
         if result["code"]:
-            print put_color(u"获取可用 ip 出错", "red")
+            print pt.put_color(u"获取可用 ip 出错", "red")
             print "原因如下:\n", result["msg"]
         else:
-            print put_color("获取可用 ip 成功", "green")
+            print pt.put_color("获取可用 ip 成功", "green")
             print "结果如下:"
             pprint(result["result"])
 
     elif choice == '3':
         result = json.loads(mt.ip_used(subnet))
         if result["code"]:
-            print put_color(u"获取已用 ip 出错", "red")
+            print pt.put_color(u"获取已用 ip 出错", "red")
             print "原因如下:\n", result["msg"]
         else:
-            print put_color("获取已用 ip 成功", "green")
+            print pt.put_color("获取已用 ip 成功", "green")
             print "结果如下:"
             pprint(result["result"])
 
@@ -134,7 +125,7 @@ def nk_menu():  # ok
         abort(1, 1)
 
     else:
-        print put_color("输入有误, 重新输入", "red")
+        print pt.put_color("输入有误, 重新输入", "red")
 
     goto .network
 
@@ -154,7 +145,7 @@ def notrun(command):  # ok
 
     if choice not in ['b', '1', '2', '3', 'q']:
         show_logo()
-        print put_color("输入有误, 重新输入", "red")
+        print pt.put_color("输入有误, 重新输入", "red")
         goto .notrun
 
     if choice == 'b':
@@ -166,7 +157,7 @@ def notrun(command):  # ok
     ip = raw_input("输入容器所在的虚拟机的 ip：")
     if ip == "":
         show_logo()
-        print put_color(u"操作已取消", "yellow")
+        print pt.put_color(u"操作已取消", "yellow")
         goto .notrun
 
     mission = {
@@ -182,21 +173,21 @@ def notrun(command):  # ok
         names = [raw_input("输入容器的 id 或名字: ")]
         if names == [""]:
             show_logo()
-            print put_color(u"操作已取消", "yellow")
+            print pt.put_color(u"操作已取消", "yellow")
             goto .notrun
 
     elif choice == "2":
         names = raw_input("输入容器的 id 或名字 (用单个空格隔开): ").split(" ")
         if names == [""]:
             show_logo()
-            print put_color(u"操作已取消", "yellow")
+            print pt.put_color(u"操作已取消", "yellow")
             goto .notrun
 
     elif choice == "3":
         mission["commands"]["command"] = "containers_ls"
         result = json.loads(mt.command2slave(ip, json.dumps(mission)))
         if result["code"]:
-            print put_color("获得 %s 的所有容器失败" % ip, "red")
+            print pt.put_color("获得 %s 的所有容器失败" % ip, "red")
             print result["msg"]
         else:
             names = []
@@ -230,14 +221,14 @@ def dk_menu():  # ok
         subnet = get_setting("bridge")["subnet"]
         result = json.loads(mt.ip_assign(subnet))
         if result["code"]:
-            print put_color("分配 ip 失败", "red")
+            print pt.put_color("分配 ip 失败", "red")
             print "原因如下:\n", result["msg"]
             goto .docker
 
         container_ip = result["result"]
         result = json.loads(mt.check_load())
         if result["code"]:
-            print put_color("负载查询失败", "red")
+            print pt.put_color("负载查询失败", "red")
             print "原因如下:\n", result["msg"]
             goto .docker
 
@@ -257,7 +248,7 @@ def dk_menu():  # ok
             }})))
 
         if image_list["code"]:
-            print put_color(u"获取虚拟机: %s 的所有镜像失败" % ip, "red")
+            print pt.put_color(u"获取虚拟机: %s 的所有镜像失败" % ip, "red")
             print u"原因如下:\n", image_list["msg"]
             goto .docker
 
@@ -265,18 +256,18 @@ def dk_menu():  # ok
         label .choice_image
         print "============="
         for i, image in enumerate(image_list["result"]):
-            print "%s: %s" % (put_color(str(i), "blue"), image)
+            print "%s: %s" % (pt.put_color(str(i), "blue"), image)
         print "============="
 
         choice_image = raw_input("> ")
         if choice_image == "":
             show_logo()
-            print put_color(u"操作已取消", "yellow")
+            print pt.put_color(u"操作已取消", "yellow")
             goto .docker
 
         if choice_image not in [str(c) for c in range(i+1)]:
             show_logo()
-            print put_color("输入有误, 重新输入", "red")
+            print pt.put_color("输入有误, 重新输入", "red")
             goto .choice_image
 
         image_name = image_list["result"][int(choice_image)]
@@ -290,14 +281,14 @@ def dk_menu():  # ok
                     }})))
 
         if result["code"]:
-            print put_color("启动容器失败", "red")
+            print pt.put_color("启动容器失败", "red")
             print "原因如下:\n", result["msg"]
             goto .docker
 
-        print put_color(u"[+]启动容器 %s 成功" % image_name, "green")
-        print u"  [-]位于虚拟机 %s 中" % put_color(ip, "white")
-        print u"  [-]容器分配的 ip 为:", put_color(result["result"]["ip"], "white")
-        print u"  [-]ID 为", put_color(result["result"]["id"], "white")
+        print pt.put_color(u"[+]启动容器 %s 成功" % image_name, "green")
+        print u"  [-]位于虚拟机 %s 中" % pt.put_color(ip, "white")
+        print u"  [-]容器分配的 ip 为:", pt.put_color(result["result"]["ip"], "white")
+        print u"  [-]ID 为", pt.put_color(result["result"]["id"], "white")
 
     elif choice == "2":
         mission = {
@@ -319,19 +310,19 @@ def dk_menu():  # ok
         for i, result in enumerate(results):
             print
             if result["code"]:
-                print "%s: slave: %s" % (i, put_color(ips[i], "red"))
+                print "%s: slave: %s" % (i, pt.put_color(ips[i], "red"))
                 print "  [X]error:", result["msg"]
                 goto .docker
 
             alive_slave.append(i)
-            print "%s: %s" % (put_color(str(i), "blue"), put_color(ips[i], "green"))
+            print "%s: %s" % (pt.put_color(str(i), "blue"), pt.put_color(ips[i], "green"))
             if result["result"] == []:
-                print put_color("  [!]Empty", "yellow")
+                print pt.put_color("  [!]Empty", "yellow")
                 empty_slave.append(i)
             else:
                 for j, r in enumerate(result["result"]):
-                    print "  %s: [%s] [%s] [%s]" % (put_color(str(j), "blue"), put_color(r["status"], "white"),
-                                                    put_color(r["ip"], "white"), put_color(r["image name"], "white"))
+                    print "  %s: [%s] [%s] [%s]" % (pt.put_color(str(j), "blue"), pt.put_color(r["status"], "white"),
+                                                    pt.put_color(r["ip"], "white"), pt.put_color(r["image name"], "white"))
 
         print "\n{}: 返回\n{}: 退出".format(*colored_choice(0))
         print "============="
@@ -346,17 +337,17 @@ def dk_menu():  # ok
 
         if not choice_slave.isdigit():
             show_logo()
-            print put_color("输入有误, 重新输入", "red")
+            print pt.put_color("输入有误, 重新输入", "red")
             goto .choice_sla
 
         choice_slave = int(choice_slave)
         if choice_slave not in alive_slave:
             show_logo()
-            print put_color("此虚拟机无法连接, 重新输入", "red")
+            print pt.put_color("此虚拟机无法连接, 重新输入", "red")
             goto .choice_sla
         elif choice_slave in empty_slave:
             show_logo()
-            print put_color("此虚拟机无容器, 重新输入", "red")
+            print pt.put_color("此虚拟机无容器, 重新输入", "red")
             goto .choice_sla
 
         ip = ips[choice_slave]
@@ -372,13 +363,13 @@ def dk_menu():  # ok
 
         if not choice_container.isdigit():
             show_logo()
-            print put_color(u"输入有误, 重新输入", "red")
+            print pt.put_color(u"输入有误, 重新输入", "red")
             goto .choice_sla
         else:
             choice_container = int(choice_container)
             if choice_container not in range(len(results[choice_slave]["result"])):
                 show_logo()
-                print put_color(u"虚拟机: %s 无此容器, 重新输入" % ip, "red")
+                print pt.put_color(u"虚拟机: %s 无此容器, 重新输入" % ip, "red")
                 goto .choice_sla
 
         id_or_name = results[choice_slave]["result"][choice_container]["id"]
@@ -390,22 +381,22 @@ def dk_menu():  # ok
             ip, json.dumps(mission)))
 
         if result["code"]:
-            print put_color(u"失败", "red")
+            print pt.put_color(u"失败", "red")
             print u"  [x]" + result["msg"]
             goto .docker
 
-        print put_color(u"成功", "green")
+        print pt.put_color(u"成功", "green")
         print u"  [-]删除容器 ...",
         mission["commands"]["arg"] = [id_or_name, "rm"]
         result = json.loads(mt.command2slave(
             ip, json.dumps(mission)))
 
         if result["code"]:
-            print put_color("失败", "red")
+            print pt.put_color("失败", "red")
             print u"  [x]" + result["msg"]
             goto .docker
 
-        print put_color(u"成功", "green")
+        print pt.put_color(u"成功", "green")
         print u"[!]完成"
 
     elif choice == "3":
@@ -442,31 +433,31 @@ def dk_menu():  # ok
                 slaves_info[ips[i]]["container"]["containers"] = result["result"]
 
         for ip in ips:
-            print "[+]slave: "+put_color(ip, "white")
+            print "[+]slave: "+pt.put_color(ip, "white")
 
             images_info = slaves_info[ip]["image"]
             if images_info["code"]:
-                print put_color("  [X]images", "red")
+                print pt.put_color("  [X]images", "red")
                 print "    [-]error: "+images_info["msg"]
             else:
-                print "  [-]images(%s)" % put_color(str(len(images_info["images"])), "blue")
+                print "  [-]images(%s)" % pt.put_color(str(len(images_info["images"])), "blue")
                 for image in images_info["images"]:
                     print "    [-]"+image
 
             containers_info = slaves_info[ip]["container"]
             if containers_info["code"]:
-                print put_color("\n  [X]containers", "red")
+                print pt.put_color("\n  [X]containers", "red")
                 print "    [-]error: "+containers_info["msg"]
             else:
-                print "\n  [-]containers(%s)" % put_color(
+                print "\n  [-]containers(%s)" % pt.put_color(
                     str(len(containers_info["containers"])), "blue")
                 for container in containers_info["containers"]:
-                    print "    [-]short id: "+put_color(container["id"][:6], "white")
-                    print "      [-]ip: "+put_color(container["ip"], "white")
+                    print "    [-]short id: "+pt.put_color(container["id"][:6], "white")
+                    print "      [-]ip: "+pt.put_color(container["ip"], "white")
                     print "      [-]id: "+container["id"]
-                    print "      [-]status: "+put_color(container["status"],
-                                                        "green" if container["status"] == "running" else "yellow")
-                    print "      [-]image name: "+put_color(container["image name"], "white")
+                    print "      [-]status: "+pt.put_color(container["status"],
+                                                           "green" if container["status"] == "running" else "yellow")
+                    print "      [-]image name: "+pt.put_color(container["image name"], "white")
                     print
 
             print "-"*50
@@ -481,13 +472,13 @@ def dk_menu():  # ok
             }})))
 
         if image_list["code"]:
-            print put_color(u"获取虚拟机: 192.168.12.1 的所有镜像失败", "red")
+            print pt.put_color(u"获取虚拟机: 192.168.12.1 的所有镜像失败", "red")
             print u"原因如下:\n", image_list["msg"]
             return
 
         images = image_list["result"]
         for i, image in enumerate(images):
-            print "%s: %s" % (put_color(str(i), "blue"), image)
+            print "%s: %s" % (pt.put_color(str(i), "blue"), image)
 
     elif choice == "5":
         dk_more_menu()
@@ -499,7 +490,7 @@ def dk_menu():  # ok
         abort(1, 1)
 
     else:
-        print put_color(u"输入有误, 重新输入", "red")
+        print pt.put_color(u"输入有误, 重新输入", "red")
 
     goto .docker
 
@@ -541,25 +532,25 @@ def dk_more_menu():
         ip = raw_input(u"输入分配容器的虚拟机的 ip: ")
         if ip == "":
             show_logo()
-            print put_color(u"操作已取消", "yellow")
+            print pt.put_color(u"操作已取消", "yellow")
             goto .dk_more_menu
 
         image_name = raw_input(u"输入镜像名（必要时加上版本号）: ")
         if image_name == "":
             show_logo()
-            print put_color(u"操作已取消", "yellow")
+            print pt.put_color(u"操作已取消", "yellow")
             goto .dk_more_menu
 
         container_ip = raw_input(u"输入给容器分配的 ip: ")
         if container_ip == "":
             show_logo()
-            print put_color(u"操作已取消", "yellow")
+            print pt.put_color(u"操作已取消", "yellow")
             goto .dk_more_menu
 
         subnet = get_setting("bridge")["subnet"]
         result = json.loads(mt.ip_assign(subnet, container_ip))
         if result["code"]:
-            print put_color(u"指定 ip 失败", "red")
+            print pt.put_color(u"指定 ip 失败", "red")
             print u"原因如下:\n", result["msg"]
         else:
             container_ip = result["result"]
@@ -573,13 +564,13 @@ def dk_more_menu():
                         }})))
 
             if result["code"]:
-                print put_color("启动容器失败", "red")
+                print pt.put_color("启动容器失败", "red")
                 print "原因如下:\n", result["msg"]
             else:
-                print put_color(u"[+]启动容器 %s 成功" % image_name, "green")
-                print u"  [-]位于虚拟机 %s 中" % put_color(ip, "white")
-                print u"  [-]容器分配的 ip 为:", put_color(result["result"]["ip"], "white")
-                print u"  [-]ID 为", put_color(result["result"]["id"], "white")
+                print pt.put_color(u"[+]启动容器 %s 成功" % image_name, "green")
+                print u"  [-]位于虚拟机 %s 中" % pt.put_color(ip, "white")
+                print u"  [-]容器分配的 ip 为:", pt.put_color(result["result"]["ip"], "white")
+                print u"  [-]ID 为", pt.put_color(result["result"]["id"], "white")
 
     elif choice in ["2", "3", "4", "5"]:
         command = {
@@ -609,7 +600,7 @@ def dk_more_menu():
         show_logo()
 
         if choice not in ['b', '1', '2', 'q']:
-            print put_color("输入有误, 重新输入", "red")
+            print pt.put_color("输入有误, 重新输入", "red")
             goto .container_or_image
 
         if choice == 'b':
@@ -632,21 +623,21 @@ def dk_more_menu():
 
         show_logo()
         if ip_num not in ['b', '1', '2', '3', 'q']:
-            print put_color("输入有误, 重新输入", "red")
+            print pt.put_color("输入有误, 重新输入", "red")
             goto .ms
 
         if ip_num == "1":
             ips = [raw_input("输入虚拟机的 ip: ")]
             if ips == [""]:
                 show_logo()
-                print put_color(u"操作已取消", "yellow")
+                print pt.put_color(u"操作已取消", "yellow")
                 goto .ms
 
         elif ip_num == "2":
             ips = raw_input("输入 ip(用单个空格隔开): ").split(" ")
             if ips == [""]:
                 show_logo()
-                print put_color(u"操作已取消", "yellow")
+                print pt.put_color(u"操作已取消", "yellow")
                 goto .ms
 
         elif ip_num == "3":
@@ -661,10 +652,10 @@ def dk_more_menu():
         results = command2all_slaves(ips, choice)
         for i, result in enumerate(results):
             if result["code"]:
-                print "[+]slave:", put_color(ips[i], "red")
+                print "[+]slave:", pt.put_color(ips[i], "red")
                 print "  [-]error:", result["msg"]
             else:
-                print "[+]slave:", put_color(ips[i], "green")
+                print "[+]slave:", pt.put_color(ips[i], "green")
                 print "  [-]result:"
                 pprint(result["result"])
                 print
@@ -673,10 +664,10 @@ def dk_more_menu():
         result = json.loads(mt.check_load())
 
         if result["code"]:
-            print put_color("负载查询失败", "red")
+            print pt.put_color("负载查询失败", "red")
             print "原因如下:\n", result["msg"]
         else:
-            print put_color("负载查询成功", "green")
+            print pt.put_color("负载查询成功", "green")
             print u"结果如下"
             pprint(result["result"])
 
@@ -687,7 +678,7 @@ def dk_more_menu():
         abort(1, 1)
 
     else:
-        print put_color("输入有误, 重新输入", "red")
+        print pt.put_color("输入有误, 重新输入", "red")
 
     goto .dk_more_menu
 
@@ -712,7 +703,7 @@ def Main_menu():
     elif choice == 'q':
         abort(1, 1)
     else:
-        print put_color("输入有误, 重新输入", "red")
+        print pt.put_color("输入有误, 重新输入", "red")
 
     goto .main
 
