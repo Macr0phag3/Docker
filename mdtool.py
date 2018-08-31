@@ -57,7 +57,7 @@ def Main_menu():
 {}: 更多操作
 {}: 退出
 ==========
-> """.format(*[i for i in colored_choice(2) if i != "b"]))
+> """.format(*[i for i in colored_choice(2) if "b" not in i]))
 
     show_logo()
     if choice == '1':
