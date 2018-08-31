@@ -43,42 +43,46 @@ def recv_command(conn):  # ok
     msg = conn.recv(1024)
 
     if not msg:
-        pass
+        return
 
-    mission = json.loads(msg)
-    commands = mission["mission"]  # 具体指令
+    results = []
+    missions = json.loads(msg)
+    for mission in missions:
+        commands = mission["mission"]  # 具体指令
+        if commands == "cmd2slave":
+            results.append(st.cmd2slave(mission["commands"])))
 
-    if commands == "cmd2slave":
-        conn.sendall(st.cmd2slave(mission["commands"]))
+        elif commands == "cmd2docker":
+            results.append(st.cmd2docker(mission["commands"]))
 
-    elif commands == "cmd2docker":
-        conn.sendall(st.cmd2docker(mission["commands"]))
+        elif commands == "reload":
+            dicts={
+                "code": 1,
+                "msg": "",
+                "result": ""
+            }
 
-    elif commands == "reload":
-        dicts = {
-            "code": 1,
-            "msg": "",
-            "result": ""
-        }
+            try:
+                reload(st)
+                dicts["code"] = 0
+            except Exception, e:
+                print pt.put_color("reload module stoolbox failed\n  [-]"+str(e), "red")
+                print traceback.format_exc()
+                print "-"*50
+                dicts["msg"] = str(e)
 
-        try:
-            reload(st)
-            dicts["code"] = 0
-        except Exception, e:
-            print pt.put_color("reload module stoolbox failed\n  [-]"+str(e), "red")
-            print traceback.format_exc()
-            print "-"*50
-            dicts["msg"] = str(e)
+            results.append(json.dumps(dicts))
 
-        conn.sendall(json.dumps(dicts))
+        else:
+            print pt.put_color("aborted command: %s" % commands, "red")
+            results.append(json.dumps({
+                "code": 1,
+                "msg": "This mission is out of slave's ability...",
+                "result": ""
+            }))
 
-    else:
-        print pt.put_color("aborted command: %s" % commands, "red")
-        conn.sendall(json.dumps({
-            "code": 1,
-            "msg": "This mission is out of slave's ability...",
-            "result": ""
-        }))
+
+    conn.sendall(json.dumps(results))
 
 
 """
@@ -88,7 +92,7 @@ def recv_command(conn):  # ok
 2. port: 监听的端口; 可选参数; 默认为 1100
 """
 
-ip = '192.168.12.1'
+ip = '0.0.0.0'
 port = 1100
 sk = socket.socket()
 sk.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -114,11 +118,11 @@ while 1:
             print pt.put_color("something went wrong\n  [-]"+str(e), "red")
             print traceback.format_exc()
             print "-"*50
-            conn.sendall(json.dumps({
+            conn.sendall(json.dumps([{
                 "code": 1,
                 "msg": str(e),
                 "result": "",
-            }))
+            }]))
 
     else:
         msg = "tell %s: silence is gold" % from_ip
