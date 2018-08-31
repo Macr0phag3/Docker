@@ -77,7 +77,7 @@ def check_alive():
     }
 
     for t in range(3):
-        if cmd.getstatusoutput("ping -c 5 -i 0.1 -w 1 baidu.com")[0] == 0:
+        if cmd.getstatusoutput("curl --connect-timeout 2 -m 2 ip.cn")[0] == 0:
             dicts["result"] = ""
             break
 
