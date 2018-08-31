@@ -22,7 +22,18 @@ def sign_in(ckey):  # ok
     return skey == ckey
 
 
-def recvd_cmd(mission, multy_mode=0):
+def recvd_cmd(mission):
+    """
+    处理 master 发来的任务，具体负责转发任务与返回结果
+
+    参数
+    1. mission: master 发来的任务
+
+    返回值
+    stoolbox.py 中的各个函数中的返回值
+    （原样返回，不做任何处理）
+    """
+
     commands = mission["mission"]  # 具体指令
     if commands == "cmd2slave":
         return st.cmd2slave(mission["commands"])
@@ -59,12 +70,12 @@ def recvd_cmd(mission, multy_mode=0):
 
 def recvd_msg(conn):  # ok
     """
-    处理 master 派发的任务，只负责转发任务与返回结果
+    处理 master 发来的消息，根据任务的数据类型（dict 与 list）
+    选择不同的处理方式与返回。
     具体任务由 stoolbox.py 中的函数完成
 
     参数
     1. conn: 建立起的通道
-
 
     {
         "mission": "cmd2slave",
@@ -77,7 +88,7 @@ def recvd_msg(conn):  # ok
 
     msg = conn.recv(1024)
 
-    if not msg:
+    if not msg:  # 空消息，直接舍弃
         return
 
     mission = json.loads(msg)
@@ -86,14 +97,14 @@ def recvd_msg(conn):  # ok
         recvd_cmd(mission)
 
     elif type(mission) == list:
-        results = [recvd_cmd(mission, multy_mode=1) for m in mission]
+        results = json.dumps([json.loads(recvd_cmd(mission)) for m in mission])
 
     else:
-        results = {
+        results = json.dumps({
             "code": 1,
             "msg": "",
             "result": "mission's type must be dict or list"
-        }
+        })
 
     conn.sendall(results)
 
