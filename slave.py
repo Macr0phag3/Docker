@@ -22,7 +22,42 @@ def sign_in(ckey):  # ok
     return skey == ckey
 
 
-def recv_command(conn):  # ok
+def recvd_cmd(mission, multy_mode=0):
+    commands = mission["mission"]  # 具体指令
+    if commands == "cmd2slave":
+        return st.cmd2slave(mission["commands"])
+
+    elif commands == "cmd2docker":
+        return st.cmd2docker(mission["commands"])
+
+    elif commands == "reload":
+        dicts = {
+            "code": 1,
+            "msg": "",
+            "result": ""
+        }
+
+        try:
+            reload(st)
+            dicts["code"] = 0
+        except Exception, e:
+            print pt.put_color("reload module stoolbox failed\n  [-]"+str(e), "red")
+            print traceback.format_exc()
+            print "-"*50
+            dicts["msg"] = str(e)
+
+        return json.dumps(dicts)
+
+    else:
+        print pt.put_color("aborted command: %s" % commands, "red")
+        return json.dumps({
+            "code": 1,
+            "msg": "This mission is out of slave's ability...",
+            "result": ""
+        })
+
+
+def recvd_msg(conn):  # ok
     """
     处理 master 派发的任务，只负责转发任务与返回结果
     具体任务由 stoolbox.py 中的函数完成
@@ -45,42 +80,20 @@ def recv_command(conn):  # ok
     if not msg:
         return
 
-    results = []
-    missions = json.loads(msg)
-    for mission in missions:
-        commands = mission["mission"]  # 具体指令
-        if commands == "cmd2slave":
-            results.append(st.cmd2slave(mission["commands"])))
+    mission = json.loads(msg)
 
-        elif commands == "cmd2docker":
-            results.append(st.cmd2docker(mission["commands"]))
+    if type(mission) == dict:
+        recvd_cmd(mission)
 
-        elif commands == "reload":
-            dicts={
-                "code": 1,
-                "msg": "",
-                "result": ""
-            }
+    elif type(mission) == list:
+        results = [recvd_cmd(mission, multy_mode=1) for m in mission]
 
-            try:
-                reload(st)
-                dicts["code"] = 0
-            except Exception, e:
-                print pt.put_color("reload module stoolbox failed\n  [-]"+str(e), "red")
-                print traceback.format_exc()
-                print "-"*50
-                dicts["msg"] = str(e)
-
-            results.append(json.dumps(dicts))
-
-        else:
-            print pt.put_color("aborted command: %s" % commands, "red")
-            results.append(json.dumps({
-                "code": 1,
-                "msg": "This mission is out of slave's ability...",
-                "result": ""
-            }))
-
+    else:
+        results = {
+            "code": 1,
+            "msg": "",
+            "result": "mission's type must be dict or list"
+        }
 
     conn.sendall(results)
 
@@ -113,7 +126,7 @@ while 1:
         conn.sendall('hello, my master')
 
         try:
-            recv_command(conn)
+            recvd_msg(conn)
         except Exception, e:
             print pt.put_color("something went wrong\n  [-]"+str(e), "red")
             print traceback.format_exc()

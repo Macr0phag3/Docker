@@ -74,32 +74,104 @@ def Main_menu():  # ok
 
 
 @with_goto
-def nk_menu():
+def basic_menu():
     label .network
     choice = raw_input("""
 ==================
 输入数字以继续:
+{}: 分配容器
+{}: 回收容器
+{}: 查看镜像
+{}: 查看容器
 {}: 检查连接
-{}: 显示可用 ip
-{}: 显示已用 ip
 {}: 返回
 {}: 退出
 ==================
-> """.format(*colored_choice(3)))
+> """.format(*colored_choice(5)))
 
-    subnet = get_setting("bridge")["subnet"]
     show_logo()
 
-    if choice == '1':
-        mission = {
+    if choice == "1":
+        result = json.loads(mt.ip_assign(subnet))
+        if result["code"]:
+            print pt.put_color(u"分配 ip 失败", "red")
+            print u"原因如下:\n", result["msg"]
+            goto .docker
+
+        container_ip = result["result"]
+        result = json.loads(mt.check_load())
+        if result["code"]:
+            print pt.put_color(u"负载查询失败", "red")
+            print u"原因如下:\n", result["msg"]
+            goto .docker
+
+        min_load = 100
+        for i in result["result"]:
+            for j in i:
+                value = i[j]["cpu"]*0.2 + i[j]["mem"]*0.8
+                if value < min_load:
+                    min_load = value
+                    ip = j
+
+        image_list = json.loads(mt.command2slave(ip, json.dumps({
+            "mission": "cmd2docker",
+            "commands": {
+                "command": "images_ls",
+                "arg": []
+            }})))
+
+        if image_list["code"]:
+            print pt.put_color(u"获取虚拟机: %s 的所有镜像失败" % ip, "red")
+            print u"原因如下:\n", image_list["msg"]
+            goto .docker
+
+        print u"选择镜像"
+        label .choice_image
+        print "============="
+        for i, image in enumerate(image_list["result"]):
+            print "%s: %s" % (pt.put_color(str(i), "blue"), image)
+        print "============="
+
+        choice_image = raw_input("> ")
+        if choice_image == "":
+            show_logo()
+            print pt.put_color(u"操作已取消", "yellow")
+            goto .docker
+
+        if choice_image not in [str(c) for c in range(i+1)]:
+            show_logo()
+            print pt.put_color("输入有误, 重新输入", "red")
+            goto .choice_image
+
+        image_name = image_list["result"][int(choice_image)]
+        result = json.loads(
+            mt.command2slave(
+                ip, json.dumps({
+                    "mission": "cmd2docker",
+                    "commands": {
+                        "command": "run",
+                        "arg": [image_name, container_ip]
+                    }})))
+
+        if result["code"]:
+            print pt.put_color("启动容器失败", "red")
+            print "原因如下:\n", result["msg"]
+            goto .docker
+
+        print pt.put_color(u"[+]启动容器 %s 成功" % image_name, "green")
+        print u"  [-]位于虚拟机 %s 中" % pt.put_color(ip, "white")
+        print u"  [-]容器分配的 ip 为:", pt.put_color(result["result"]["ip"], "white")
+        print u"  [-]ID 为", pt.put_color(result["result"]["id"], "white")
+
+    elif choice == '4':
+        mission = [{
             "mission": "cmd2slave",
             "commands": {
                 "command": "check_alive",
                 "arg": [subnet]
             }
-        }
+        }]
 
-        ips = get_setting("slave_ip")
         for ip in ips:
             result = json.loads(mt.command2slave(ip, json.dumps(mission), timeout=10))
             if result["code"]:
@@ -112,26 +184,6 @@ def nk_menu():
                 else:
                     print pt.put_color(ip, "green"), pt.put_color(
                         u"内网", "green"), pt.put_color(u"外网", "green")
-
-    elif choice == '2':
-        result = json.loads(mt.ip_ls(subnet))
-        if result["code"]:
-            print pt.put_color(u"获取可用 ip 出错", "red")
-            print "原因如下:\n", result["msg"]
-        else:
-            print pt.put_color("获取可用 ip 成功", "green")
-            print "结果如下:"
-            pprint(result["result"])
-
-    elif choice == '3':
-        result = json.loads(mt.ip_used(subnet))
-        if result["code"]:
-            print pt.put_color(u"获取已用 ip 出错", "red")
-            print "原因如下:\n", result["msg"]
-        else:
-            print pt.put_color("获取已用 ip 成功", "green")
-            print "结果如下:"
-            pprint(result["result"])
 
     elif choice == 'b':
         return
@@ -147,6 +199,9 @@ def nk_menu():
 
 signal.signal(signal.SIGINT, abort)
 signal.signal(signal.SIGTERM, abort)
+
+ips = mt.setting["slave_ip"]
+subnet = mt.setting["bridge"]["subnet"]
 
 show_logo()
 Main_menu()
