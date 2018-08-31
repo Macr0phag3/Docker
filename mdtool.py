@@ -86,7 +86,7 @@ def nk_menu():  # ok
 
         ips = get_setting("slave_ip")
         for ip in ips:
-            result = json.loads(mt.command2slave(ip, json.dumps(mission), timeout=10))
+            result = json.loads(mt.command2slave(ip, json.dumps(mission), timeout=5))
             if result["code"]:
                 print pt.put_color(ip, "red"), pt.put_color(
                     u"内网", "red"), pt.put_color(u"外网", "red")

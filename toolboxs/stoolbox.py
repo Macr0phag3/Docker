@@ -77,12 +77,11 @@ def check_alive():
         "result": ""
     }
 
-    for t in range(3):
-        try:
-            requests.get("http://baidu.com", timeout=1)
-            dicts["result"] = ""
-        except:
-            dicts["result"] = "request to baidu.com failed"
+    try:
+        requests.get("http://baidu.com", timeout=3)
+        dicts["result"] = ""
+    except:
+        dicts["result"] = "request to baidu.com failed"
 
     return json.dumps(dicts)
 
