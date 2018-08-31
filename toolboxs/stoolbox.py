@@ -4,7 +4,7 @@ import psutil
 import traceback
 import json
 import commands as cmd
-import time
+from toolboxs import ptoolbox as pt
 
 """
 1. 返回值 json 说明：
@@ -82,23 +82,6 @@ def check_alive():
             break
 
     return json.dumps(dicts)
-
-
-def log(msg, level, description, path="./"):  # ok
-    """
-    记录事件，默认路径为 slave.py 所在路径
-    log 文件名为 .slave_log
-
-    参数:
-    1. level: 事件等级
-    2. description: 事件描述
-    3. message: 事件原因的具体描述
-    4. path: log 文件的路径; 可选; 默认为 ./
-    """
-
-    with open(path+".slave_log", "a") as fp:
-        fp.write("[%s]\nlevel: %s\ndescription: %s\nmessage: %s\n\n" %
-                 (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), level, description.encode("utf8"), msg))
 
 
 def ip_used_ls(subnet):
@@ -191,7 +174,7 @@ def run(image_name, ip, command="", nk_name="containers"):  #
 
     except Exception, e:
         log(traceback.format_exc(), level="error",
-            description="run a container: %s: %s failed" % (image_name, ip))
+            description="run a container: %s: %s failed" % (image_name, ip), path=".slave_log")
 
         dicts["msg"] = str(e)
 
@@ -224,8 +207,8 @@ def others_cmd(id_or_name, command):  # ok
     try:
         container = client.containers.get(id_or_name)
     except Exception, e:
-        log(traceback.format_exc(), level="error",
-            description="no such container: %s" % (id_or_name))
+        pt.log(traceback.format_exc(), level="error",
+               description="no such container: %s" % (id_or_name), path=".slave_log")
 
         dicts["msg"] = str(e)
         return json.dumps(dicts)
@@ -241,8 +224,8 @@ def others_cmd(id_or_name, command):  # ok
         commands[command]()
         dicts["code"] = 0
     except Exception, e:
-        log(traceback.format_exc(), level="error",
-            description="%s the container %s failed" % (command, id_or_name))
+        pt.log(traceback.format_exc(), level="error",
+               description="%s the container %s failed" % (command, id_or_name), path=".slave_log")
 
         dicts["msg"] = str(e)
 
@@ -298,8 +281,8 @@ def containers_ls():  # ok
         dicts["code"] = 0
 
     except Exception, e:
-        log(traceback.format_exc(), level="error",
-            description="get all containers failed")
+        pt.log(traceback.format_exc(), level="error",
+               description="get all containers failed", path=".slave_log")
 
         dicts["msg"] = str(e)
 
@@ -332,8 +315,8 @@ def images_ls():  # ok
         dicts["result"] = [i.tags[0] for i in client.images.list()]
         dicts["code"] = 0
     except Exception, e:
-        log(traceback.format_exc(), level="error",
-            description="get all images failed")
+        pt.log(traceback.format_exc(), level="error",
+               description="get all images failed", path=".slave_log")
 
         dicts["msg"] = str(e)
 
@@ -366,8 +349,8 @@ def load_ls():  # ok
         dicts["result"]["mem"] = psutil.virtual_memory().percent
         dicts["code"] = 0
     except Exception, e:
-        log(traceback.format_exc(), level="error",
-            description="get loads failed")
+        pt.log(traceback.format_exc(), level="error",
+               description="get loads failed", path=".slave_log")
 
         dicts["msg"] = str(e)
 
@@ -421,14 +404,14 @@ ip route del default;\
 ip route add default via %s dev $iface""" % (raw_ip, raw_ip, iface, iface, gateway))
 
         if status:
-            log(err, level="error", description="bridge network failed")
+            pt.log(err, level="error", description="bridge network failed", path=".slave_log")
             dicts["msg"] = err
         else:
             dicts["code"] = 0
 
     except Exception, e:
-        log(traceback.format_exc(), level="error",
-            description="create network failed")
+        pt.log(traceback.format_exc(), level="error",
+               description="create network failed", path=".slave_log")
 
         dicts["msg"] = str(e)
 
@@ -461,7 +444,7 @@ docker network rm %s;
 systemctl restart network""" % (nk_name))
 
     if status:
-        log(err, level="error", description="unbridge network failed")
+        log(err, level="error", description="unbridge network failed", path=".slave_log")
         dicts["msg"] = err
     else:
         dicts["code"] = 0

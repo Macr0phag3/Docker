@@ -1,20 +1,10 @@
 # -*- coding:utf-8 -*-
 import socket
 from toolboxs import stoolbox as st
+from toolboxs import ptoolbox as pt
 import json
 import traceback
 import time
-
-
-def put_color(string, color):  # ok
-    colors = {
-        "green": "32",
-        "red": "31",
-        "yellow": "33",
-        "white": "37",
-        "blue": "36",
-    }
-    return "\033[40;1;%s;40m%s\033[0m" % (colors[color], string)
 
 
 def sign_in(ckey):  # ok
@@ -75,7 +65,7 @@ def recv_command(conn):  # ok
             reload(st)
             dicts["code"] = 0
         except Exception, e:
-            print put_color("reload module stoolbox failed\n  [-]"+str(e), "red")
+            print pt.put_color("reload module stoolbox failed\n  [-]"+str(e), "red")
             print traceback.format_exc()
             print "-"*50
             dicts["msg"] = str(e)
@@ -83,7 +73,7 @@ def recv_command(conn):  # ok
         conn.sendall(json.dumps(dicts))
 
     else:
-        print put_color("aborted command: %s" % commands, "red")
+        print pt.put_color("aborted command: %s" % commands, "red")
         conn.sendall(json.dumps({
             "code": 1,
             "msg": "This mission is out of slave's ability...",
@@ -105,13 +95,13 @@ sk.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 sk.bind((ip, port))
 sk.listen(1)
 
-print put_color('slave is online', "green")
+print pt.put_color('slave is online', "green")
 
 while 1:
     try:
         conn, from_ip = sk.accept()
     except:
-        print put_color('slave is offline', "red")
+        print pt.put_color('slave is offline', "red")
         break
 
     client_data = conn.recv(1024)
@@ -121,7 +111,7 @@ while 1:
         try:
             recv_command(conn)
         except Exception, e:
-            print put_color("something went wrong\n  [-]"+str(e), "red")
+            print pt.put_color("something went wrong\n  [-]"+str(e), "red")
             print traceback.format_exc()
             print "-"*50
             conn.sendall(json.dumps({
@@ -132,7 +122,7 @@ while 1:
 
     else:
         msg = "tell %s: silence is gold" % from_ip
-        print put_color(msg, "yellow")
+        print pt.put_color(msg, "yellow")
         conn.sendall(msg)
 
     conn.close()
