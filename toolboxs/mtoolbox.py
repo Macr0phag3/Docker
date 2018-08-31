@@ -212,7 +212,7 @@ def check_load():
     return json.dumps(dicts)
 
 
-def command2slave(ip, mission, port=1100, timeout=60):  # ok
+def command2slave(ip, mission, port=1122, timeout=60):  # ok
     """
     对 slave 指派任务
 
@@ -227,7 +227,7 @@ def command2slave(ip, mission, port=1100, timeout=60):  # ok
                 "arg": [],  # 参数列表
             }
         }
-    3. port: 与 slave 的通信端口; 可选; 默认为 1100
+    3. port: 与 slave 的通信端口; 可选; 默认为 1122
     4. timeout: 等待 slave 返回的超时时间; 可选; 默认为 60s
 
     返回值示例

@@ -114,11 +114,11 @@ def recvd_msg(conn):  # ok
 监听端口，负责建立通信
 
 1. ip: 允许接入的 ip；默认为 0.0.0.0, 即任意 ip
-2. port: 监听的端口; 可选参数; 默认为 1100
+2. port: 监听的端口; 可选参数; 默认为 1122
 """
 
 ip = '0.0.0.0'
-port = 1100
+port = 1122
 sk = socket.socket()
 sk.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 sk.bind((ip, port))
