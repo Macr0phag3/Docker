@@ -14,10 +14,6 @@ def abort(a, b):
     sys.exit("\nBye~")
 
 
-signal.signal(signal.SIGINT, abort)
-signal.signal(signal.SIGTERM, abort)
-
-
 @with_goto
 def Main_menu():
     label .main
@@ -71,5 +67,6 @@ def Main_menu():
     goto .main
 
 
-if __name__ == '__main__':
-    Main_menu()
+signal.signal(signal.SIGINT, abort)
+signal.signal(signal.SIGTERM, abort)
+Main_menu()
