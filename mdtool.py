@@ -22,7 +22,7 @@ def abort(a, b):  # ok
 
 
 def colored_choice(num):
-    num_color = [pt.put_color(str(i+1), "blue") for i in range(num)]
+    num_color = [pt.put_color(str(i), "blue") for i in range(num)]
     alpha_color = [pt.put_color(i, "yellow") for i in ['b', 'q']]
     return num_color + alpha_color
 
@@ -48,7 +48,7 @@ hack it and docker it
 
 
 @with_goto
-def Main_menu():
+def Main_menu():  # ok
     label .main
     choice = raw_input("""
 ==========
@@ -59,13 +59,94 @@ def Main_menu():
 输入序号> """.format(*[i for i in colored_choice(2) if "b" not in i]))
 
     show_logo()
-    if choice == '1':
-        baby_menu()
-    elif choice == '2':
+    if choice == '0':
+        basic_menu()
+
+    elif choice == '1':
         pro_menu()
+
     elif choice == 'q':
         abort(1, 1)
     else:
         print pt.put_color("输入有误, 重新输入", "red")
 
     goto .main
+
+
+@with_goto
+def nk_menu():
+    label .network
+    choice = raw_input("""
+==================
+输入数字以继续:
+{}: 检查连接
+{}: 显示可用 ip
+{}: 显示已用 ip
+{}: 返回
+{}: 退出
+==================
+> """.format(*colored_choice(3)))
+
+    subnet = get_setting("bridge")["subnet"]
+    show_logo()
+
+    if choice == '1':
+        mission = {
+            "mission": "cmd2slave",
+            "commands": {
+                "command": "check_alive",
+                "arg": [subnet]
+            }
+        }
+
+        ips = get_setting("slave_ip")
+        for ip in ips:
+            result = json.loads(mt.command2slave(ip, json.dumps(mission), timeout=10))
+            if result["code"]:
+                print pt.put_color(ip, "red"), pt.put_color(
+                    u"内网", "red"), pt.put_color(u"外网", "red")
+            else:
+                if result["result"]:
+                    print pt.put_color(ip, "yellow"), pt.put_color(
+                        u"内网", "green"), pt.put_color(u"外网", "red")
+                else:
+                    print pt.put_color(ip, "green"), pt.put_color(
+                        u"内网", "green"), pt.put_color(u"外网", "green")
+
+    elif choice == '2':
+        result = json.loads(mt.ip_ls(subnet))
+        if result["code"]:
+            print pt.put_color(u"获取可用 ip 出错", "red")
+            print "原因如下:\n", result["msg"]
+        else:
+            print pt.put_color("获取可用 ip 成功", "green")
+            print "结果如下:"
+            pprint(result["result"])
+
+    elif choice == '3':
+        result = json.loads(mt.ip_used(subnet))
+        if result["code"]:
+            print pt.put_color(u"获取已用 ip 出错", "red")
+            print "原因如下:\n", result["msg"]
+        else:
+            print pt.put_color("获取已用 ip 成功", "green")
+            print "结果如下:"
+            pprint(result["result"])
+
+    elif choice == 'b':
+        return
+
+    elif choice == 'q':
+        abort(1, 1)
+
+    else:
+        print pt.put_color("输入有误, 重新输入", "red")
+
+    goto .network
+
+
+signal.signal(signal.SIGINT, abort)
+signal.signal(signal.SIGTERM, abort)
+
+show_logo()
+Main_menu()
