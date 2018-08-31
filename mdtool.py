@@ -50,18 +50,17 @@ hack it and docker it
 @with_goto
 def Main_menu():
     label .main
-    choice = raw_input(
-        """
+    choice = raw_input("""
 ==========
 {}: 基本操作
 {}: 更多操作
 {}: 退出
 ==========
-> """.format(*[i for i in colored_choice(2) if "b" not in i]))
+输入序号> """.format(*[i for i in colored_choice(2) if "b" not in i]))
 
     show_logo()
     if choice == '1':
-        nk_menu()
+        basis_menu()
     elif choice == '2':
         dk_menu()
     elif choice == 'q':
