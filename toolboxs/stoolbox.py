@@ -5,6 +5,7 @@ import traceback
 import json
 import commands as cmd
 from toolboxs import ptoolbox as pt
+import requests
 
 """
 1. 返回值 json 说明：
@@ -73,13 +74,15 @@ def check_alive():
     dicts = {
         "code": 0,
         "msg": "",
-        "result": "curl to ip.cn failed"
+        "result": ""
     }
 
     for t in range(3):
-        if cmd.getstatusoutput("curl --connect-timeout 2 -m 2 ip.cn")[0] == 0:
+        try:
+            requests.get("http://baidu.com", timeout=1)
             dicts["result"] = ""
-            break
+        except:
+            dicts["result"] = "request to baidu.com failed"
 
     return json.dumps(dicts)
 
