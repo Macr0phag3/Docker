@@ -20,41 +20,6 @@ import ptoolbox as pt
 """
 
 
-def load_setting(config):  # ok
-    """
-    返回 .setting 中的配置
-
-    参数
-    1. config: 具体配置
-
-    返回值示例
-    dicts = {
-        "subnet": "192.168.0.0/18",
-        "self_ip": "192.168.12.1",
-        "iface": "eth0",
-        "gateway": "192.168.7.1"
-    }
-    """
-
-    dicts = {
-        "code": 1,
-        "msg": "",
-        "result": []
-    }
-
-    try:
-        with open(".setting", "r") as fp:
-            dicts["result"] = json.load(fp)[config]
-            dicts["code"] = 0
-    except Exception, e:
-        pt.log(traceback.format_exc(), level="error",
-               description="load setting: %s failed!" % (config), path=".master_log")
-
-        dicts["msg"] = str(e)
-
-    return json.dumps(dicts)
-
-
 def ip_used(subnet):  # ok
     """
     查看已经使用过的 ip 地址
@@ -88,7 +53,7 @@ def ip_used(subnet):  # ok
         }
     }
 
-    result = json.loads(load_setting("slave_ip"))
+    result = json.loads(setting["slave_ip"])
     if result["code"]:
         dicts["msg"] = result["msg"]
     else:
@@ -228,7 +193,7 @@ def check_load():
         }
     }
 
-    result = json.loads(load_setting("slave_ip"))
+    result = json.loads(setting["slave_ip"])
     if result["code"]:
         dicts["msg"] = result["msg"]
     else:
@@ -311,3 +276,14 @@ def command2slave(ip, mission, port=1100, timeout=60):  # ok
         dicts["msg"] = "send a mission to slave(%s) failed: %s" % (ip, str(e))
 
     return json.dumps(dicts)
+
+
+try:
+    with open(".setting", "r") as fp:
+        setting = json.load(fp)
+except Exception, e:
+    print pt.put_color(u"载入配置出错", "red")
+    print str(e)
+    pt.log(traceback.format_exc(), level="error",
+           description="load setting failed!", path=".master_log")
+    raise

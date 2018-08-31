@@ -119,10 +119,8 @@ def ip_used_ls(subnet):
         dicts["result"] = [containers[i]["IPv4Address"].split("/")[0] for i in containers]
         dicts["code"] = 0
     else:
-        dicts["msg"] = {
-            0: "slave 的 docker 不存在此网段",
-            1: "网桥出现重复的问题",
-        }[len(result) == 0]
+        dicts["msg"] = "slave(%s) report a error: %s" % (setting["bridge"]["self_ip"], [
+            "slave 的 docker 不存在此网段", "网桥出现重复的问题", ][len(result) != 0])
 
     return json.dumps(dicts)
 
@@ -174,7 +172,7 @@ def run(image_name, ip, command="", nk_name="containers"):  #
         log(traceback.format_exc(), level="error",
             description="run a container: %s: %s failed" % (image_name, ip), path=".slave_log")
 
-        dicts["msg"] = str(e)
+        dicts["msg"] = "slave(%s) report a error: %s" % (setting["bridge"]["self_ip"], str(e))
 
     return json.dumps(dicts)
 
@@ -208,7 +206,7 @@ def others_cmd(id_or_name, command):  # ok
         pt.log(traceback.format_exc(), level="error",
                description="no such container: %s" % (id_or_name), path=".slave_log")
 
-        dicts["msg"] = str(e)
+        dicts["msg"] = "slave(%s) report a error: %s" % (setting["bridge"]["self_ip"], str(e))
         return json.dumps(dicts)
 
     commands = {
@@ -225,7 +223,7 @@ def others_cmd(id_or_name, command):  # ok
         pt.log(traceback.format_exc(), level="error",
                description="%s the container %s failed" % (command, id_or_name), path=".slave_log")
 
-        dicts["msg"] = str(e)
+        dicts["msg"] = "slave(%s) report a error: %s" % (setting["bridge"]["self_ip"], str(e))
 
     return json.dumps(dicts)
 
@@ -282,7 +280,7 @@ def containers_ls():  # ok
         pt.log(traceback.format_exc(), level="error",
                description="get all containers failed", path=".slave_log")
 
-        dicts["msg"] = str(e)
+        dicts["msg"] = "slave(%s) report a error: %s" % (setting["bridge"]["self_ip"], str(e))
 
     return json.dumps(dicts)
 
@@ -316,7 +314,7 @@ def images_ls():  # ok
         pt.log(traceback.format_exc(), level="error",
                description="get all images failed", path=".slave_log")
 
-        dicts["msg"] = str(e)
+        dicts["msg"] = "slave(%s) report a error: %s" % (setting["bridge"]["self_ip"], str(e))
 
     return json.dumps(dicts)
 
@@ -350,7 +348,7 @@ def load_ls():  # ok
         pt.log(traceback.format_exc(), level="error",
                description="get loads failed", path=".slave_log")
 
-        dicts["msg"] = str(e)
+        dicts["msg"] = "slave(%s) report a error: %s" % (setting["bridge"]["self_ip"], str(e))
 
     return json.dumps(dicts)
 
@@ -403,7 +401,7 @@ ip route add default via %s dev $iface""" % (raw_ip, raw_ip, iface, iface, gatew
 
         if status:
             pt.log(err, level="error", description="bridge network failed", path=".slave_log")
-            dicts["msg"] = err
+            dicts["msg"] = "slave(%s) report a error: %s" % (setting["bridge"]["self_ip"], err)
         else:
             dicts["code"] = 0
 
@@ -411,7 +409,7 @@ ip route add default via %s dev $iface""" % (raw_ip, raw_ip, iface, iface, gatew
         pt.log(traceback.format_exc(), level="error",
                description="create network failed", path=".slave_log")
 
-        dicts["msg"] = str(e)
+        dicts["msg"] = "slave(%s) report a error: %s" % (setting["bridge"]["self_ip"], str(e))
 
     return json.dumps(dicts)
 
@@ -443,8 +441,19 @@ systemctl restart network""" % (nk_name))
 
     if status:
         log(err, level="error", description="unbridge network failed", path=".slave_log")
-        dicts["msg"] = err
+        dicts["msg"] = "slave(%s) report a error: %s" % (setting["bridge"]["self_ip"], err)
     else:
         dicts["code"] = 0
 
     return json.dumps(dicts)
+
+
+try:
+    with open(".setting", "r") as fp:
+        setting = json.load(fp)
+except Exception, e:
+    print pt.put_color(u"载入配置出错", "red")
+    print str(e)
+    pt.log(traceback.format_exc(), level="error",
+           description="load setting failed!", path=".slave_log")
+    raise
