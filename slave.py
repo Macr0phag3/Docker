@@ -129,31 +129,34 @@ print pt.put_color('slave is online', "green")
 while 1:
     try:
         conn, from_ip = sk.accept()
-    except:
-        print pt.put_color('slave is offline', "red")
-        break
+        client_data = conn.recv(1024)
+        if sign_in(client_data):
+            conn.sendall('hello, my master')
+            try:
+                recvd_msg(conn)
+            except Exception, e:
+                print pt.put_color(u"处理信息时发生问题\n  [-]"+str(e), "red")
+                print "-"*50
+                pt.log(traceback.format_exc(), level="error",
+                       description="reload module stoolbox failed", path=".slave_log")
 
-    client_data = conn.recv(1024)
-    if sign_in(client_data):
-        conn.sendall('hello, my master')
-
-        try:
-            recvd_msg(conn)
-        except Exception, e:
-            print pt.put_color(u"有点问题...\n  [-]"+str(e), "red")
+                conn.sendall(json.dumps([{
+                    "code": 1,
+                    "msg": str(e),
+                    "result": "",
+                }]))
+        else:
+            msg = u"来自 %s 的非法访问. silence is gold..." % from_ip
+            print pt.put_color(msg, "yellow")
+            conn.sendall(msg)
+    except Exception, e:
+        if "Keyboard" not in str(e):
+            print pt.put_color(u"出现一个隐藏问题\n  [-]"+str(e), "red")
             print "-"*50
             pt.log(traceback.format_exc(), level="error",
-                   description="reload module stoolbox failed", path=".slave_log")
+                   description="slave reported an error", path=".slave_log")
 
-            conn.sendall(json.dumps([{
-                "code": 1,
-                "msg": str(e),
-                "result": "",
-            }]))
-
-    else:
-        msg = u"来自 %s 的非法访问. silence is gold..." % from_ip
-        print pt.put_color(msg, "yellow")
-        conn.sendall(msg)
+        print pt.put_color('slave is offline', "red")
+        break
 
     conn.close()
