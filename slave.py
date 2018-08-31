@@ -52,7 +52,7 @@ def recvd_cmd(mission):
             reload(st)
             dicts["code"] = 0
         except Exception, e:
-            print pt.put_color("reload module stoolbox failed\n  [-]"+str(e), "red")
+            print pt.put_color(u"重新载入模块: stoolbox 失败\n  [-]"+str(e), "red")
             print "-"*50
             pt.log(traceback.format_exc(), level="error",
                    description="reload module stoolbox failed", path=".slave_log")
@@ -61,7 +61,7 @@ def recvd_cmd(mission):
         return json.dumps(dicts)
 
     else:
-        print pt.put_color("aborted command: %s" % commands, "red")
+        print pt.put_color(u"无法执行此任务: %s" % commands, "red")
         return json.dumps({
             "code": 1,
             "msg": "This mission is out of slave's ability...",
@@ -140,7 +140,7 @@ while 1:
         try:
             recvd_msg(conn)
         except Exception, e:
-            print pt.put_color("something went wrong\n  [-]"+str(e), "red")
+            print pt.put_color(u"有点问题...\n  [-]"+str(e), "red")
             print "-"*50
             pt.log(traceback.format_exc(), level="error",
                    description="reload module stoolbox failed", path=".slave_log")
@@ -152,7 +152,7 @@ while 1:
             }]))
 
     else:
-        msg = "tell %s: silence is gold" % from_ip
+        msg = u"来自 %s 的非法访问. silence is gold..." % from_ip
         print pt.put_color(msg, "yellow")
         conn.sendall(msg)
 
