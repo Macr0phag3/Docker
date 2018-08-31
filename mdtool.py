@@ -164,13 +164,13 @@ def basic_menu():
         print u"  [-]ID 为", pt.put_color(result["result"]["id"], "white")
 
     elif choice == '4':
-        mission = [{
+        mission = {
             "mission": "cmd2slave",
             "commands": {
                 "command": "check_alive",
                 "arg": [subnet]
             }
-        }]
+        }
 
         for ip in ips:
             result = json.loads(mt.command2slave(ip, json.dumps(mission), timeout=10))
