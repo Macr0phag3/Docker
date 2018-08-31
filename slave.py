@@ -82,7 +82,7 @@ def recv_command(conn):  # ok
             }))
 
 
-    conn.sendall(json.dumps(results))
+    conn.sendall(results)
 
 
 """
