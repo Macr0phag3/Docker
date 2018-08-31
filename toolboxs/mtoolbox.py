@@ -259,7 +259,7 @@ def command2slave(ip, mission, port=1100, timeout=60):  # ok
                 return json.dumps(dicts)
 
     try:
-        sk.sendall("xxxxxxxxxx")  # 认证 key
+        sk.sendall("hack it and docker it!")  # 认证 key
         server_reply = sk.recv(1024)
 
         if server_reply == "hello, my master":  # 认证成功

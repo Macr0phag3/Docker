@@ -18,7 +18,7 @@ def sign_in(ckey):  # ok
     True
     """
 
-    skey = "xxxxxxxxxx"
+    skey = "hack it and docker it!"
     return skey == ckey
 
 
