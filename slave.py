@@ -88,7 +88,7 @@ def recv_command(conn):  # ok
 2. port: 监听的端口; 可选参数; 默认为 1100
 """
 
-ip = '0.0.0.0'
+ip = '192.168.12.1'
 port = 1100
 sk = socket.socket()
 sk.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
