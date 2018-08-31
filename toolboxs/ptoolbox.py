@@ -17,3 +17,14 @@ def log(msg, level, description, path):  # ok
     with open(path, "a") as fp:
         fp.write("[%s]\nlevel: %s\ndescription: %s\nmessage: %s\n\n" %
                  (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), level, description.encode("utf8"), msg))
+
+
+def put_color(string, color):  # ok
+    colors = {
+        "green": "32",
+        "red": "31",
+        "yellow": "33",
+        "white": "37",
+        "blue": "36",
+    }
+    return "\033[40;1;%s;40m%s\033[0m" % (colors[color], string)
