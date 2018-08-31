@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import mtoolbox
+from toolboxs import mtoolbox as mt
 from goto import with_goto
 from pprint import pprint
 import sys
@@ -58,7 +58,7 @@ hack it and docker it
 
 
 def get_setting(name):
-    setting = json.loads(mtoolbox.load_setting(name))
+    setting = json.loads(mt.load_setting(name))
     if setting["code"]:
         show_logo()
         print put_color(u"获取配置失败", "red")
@@ -96,7 +96,7 @@ def nk_menu():  # ok
 
         ips = get_setting("slave_ip")
         for ip in ips:
-            result = json.loads(mtoolbox.command2slave(ip, json.dumps(mission), timeout=10))
+            result = json.loads(mt.command2slave(ip, json.dumps(mission), timeout=10))
             if result["code"]:
                 print put_color(ip, "red"), put_color(u"内网", "red"), put_color(u"外网", "red")
             else:
@@ -108,7 +108,7 @@ def nk_menu():  # ok
                         u"内网", "green"), put_color(u"外网", "green")
 
     elif choice == '2':
-        result = json.loads(mtoolbox.ip_ls(subnet))
+        result = json.loads(mt.ip_ls(subnet))
         if result["code"]:
             print put_color(u"获取可用 ip 出错", "red")
             print "原因如下:\n", result["msg"]
@@ -118,7 +118,7 @@ def nk_menu():  # ok
             pprint(result["result"])
 
     elif choice == '3':
-        result = json.loads(mtoolbox.ip_used(subnet))
+        result = json.loads(mt.ip_used(subnet))
         if result["code"]:
             print put_color(u"获取已用 ip 出错", "red")
             print "原因如下:\n", result["msg"]
@@ -194,7 +194,7 @@ def notrun(command):  # ok
 
     elif choice == "3":
         mission["commands"]["command"] = "containers_ls"
-        result = json.loads(mtoolbox.command2slave(ip, json.dumps(mission)))
+        result = json.loads(mt.command2slave(ip, json.dumps(mission)))
         if result["code"]:
             print put_color("获得 %s 的所有容器失败" % ip, "red")
             print result["msg"]
@@ -207,7 +207,7 @@ def notrun(command):  # ok
 
     for name in names:
         mission["commands"]["arg"] = [name, command]
-        pprint(mtoolbox.command2slave(ip, json.dumps(mission)))
+        pprint(mt.command2slave(ip, json.dumps(mission)))
 
 
 @with_goto
@@ -228,14 +228,14 @@ def dk_menu():  # ok
     show_logo()
     if choice == "1":
         subnet = get_setting("bridge")["subnet"]
-        result = json.loads(mtoolbox.ip_assign(subnet))
+        result = json.loads(mt.ip_assign(subnet))
         if result["code"]:
             print put_color("分配 ip 失败", "red")
             print "原因如下:\n", result["msg"]
             goto .docker
 
         container_ip = result["result"]
-        result = json.loads(mtoolbox.check_load())
+        result = json.loads(mt.check_load())
         if result["code"]:
             print put_color("负载查询失败", "red")
             print "原因如下:\n", result["msg"]
@@ -249,7 +249,7 @@ def dk_menu():  # ok
                     min_load = value
                     ip = j
 
-        image_list = json.loads(mtoolbox.command2slave(ip, json.dumps({
+        image_list = json.loads(mt.command2slave(ip, json.dumps({
             "mission": "cmd2docker",
             "commands": {
                 "command": "images_ls",
@@ -281,7 +281,7 @@ def dk_menu():  # ok
 
         image_name = image_list["result"][int(choice_image)]
         result = json.loads(
-            mtoolbox.command2slave(
+            mt.command2slave(
                 ip, json.dumps({
                     "mission": "cmd2docker",
                     "commands": {
@@ -386,7 +386,7 @@ def dk_menu():  # ok
         print u"[+]回收容器:", id_or_name
         mission["commands"]["arg"] = [id_or_name, "kill"]
         print u"  [-]停止容器 ...",
-        result = json.loads(mtoolbox.command2slave(
+        result = json.loads(mt.command2slave(
             ip, json.dumps(mission)))
 
         if result["code"]:
@@ -397,7 +397,7 @@ def dk_menu():  # ok
         print put_color(u"成功", "green")
         print u"  [-]删除容器 ...",
         mission["commands"]["arg"] = [id_or_name, "rm"]
-        result = json.loads(mtoolbox.command2slave(
+        result = json.loads(mt.command2slave(
             ip, json.dumps(mission)))
 
         if result["code"]:
@@ -473,7 +473,7 @@ def dk_menu():  # ok
 
     elif choice == "4":
         show_logo()
-        image_list = json.loads(mtoolbox.command2slave("192.168.12.1", json.dumps({
+        image_list = json.loads(mt.command2slave("192.168.12.1", json.dumps({
             "mission": "cmd2docker",
             "commands": {
                 "command": "images_ls",
@@ -514,7 +514,7 @@ def command2all_slaves(ips, command):
                 "arg": []
             }
         }
-        result.append(json.loads(mtoolbox.command2slave(ip, json.dumps(mission))))
+        result.append(json.loads(mt.command2slave(ip, json.dumps(mission))))
     return result
 
 
@@ -557,14 +557,14 @@ def dk_more_menu():
             goto .dk_more_menu
 
         subnet = get_setting("bridge")["subnet"]
-        result = json.loads(mtoolbox.ip_assign(subnet, container_ip))
+        result = json.loads(mt.ip_assign(subnet, container_ip))
         if result["code"]:
             print put_color(u"指定 ip 失败", "red")
             print u"原因如下:\n", result["msg"]
         else:
             container_ip = result["result"]
             result = json.loads(
-                mtoolbox.command2slave(
+                mt.command2slave(
                     ip, json.dumps({
                         "mission": "cmd2docker",
                         "commands": {
@@ -670,7 +670,7 @@ def dk_more_menu():
                 print
 
     elif choice == "7":
-        result = json.loads(mtoolbox.check_load())
+        result = json.loads(mt.check_load())
 
         if result["code"]:
             print put_color("负载查询失败", "red")
