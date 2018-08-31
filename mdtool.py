@@ -60,7 +60,7 @@ def Main_menu():
 
     show_logo()
     if choice == '1':
-        basis_menu()
+        baby_menu()
     elif choice == '2':
         pro_menu()
     elif choice == 'q':
