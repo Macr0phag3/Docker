@@ -45,3 +45,28 @@ def show_logo():  # ok
     """, "yellow"),  pt.put_color("""
 hack it and docker it
 """, "green"), pt.put_color("======================\n", "white"))
+
+
+@with_goto
+def Main_menu():
+    label .main
+    choice = raw_input(
+        """
+==========
+{}: 基本操作
+{}: 更多操作
+{}: 退出
+==========
+> """.format(*[i for i in colored_choice(2) if i != "b"]))
+
+    show_logo()
+    if choice == '1':
+        nk_menu()
+    elif choice == '2':
+        dk_menu()
+    elif choice == 'q':
+        abort(1, 1)
+    else:
+        print pt.put_color("输入有误, 重新输入", "red")
+
+    goto .main
