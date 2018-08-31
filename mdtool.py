@@ -62,7 +62,7 @@ def Main_menu():
     if choice == '1':
         basis_menu()
     elif choice == '2':
-        dk_menu()
+        pro_menu()
     elif choice == 'q':
         abort(1, 1)
     else:
